@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+build.log
+*.log
+*.part
+*.tmp
+*.temp
+releases/*.mrpack
+releases/*.zip
+releases/*.sha256
+releases/SHA256SUMS
+.vscode/
+.minecraft/
+*.iml
+.idea/

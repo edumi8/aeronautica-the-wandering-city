@@ -1,0 +1,77 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile scripts/validate.py install.py
+
+      - name: Validate JSON files
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          for path in [pathlib.Path('modpack/manifest.json')]:
+              json.loads(path.read_text(encoding='utf-8'))
+          print('JSON validation passed')
+          PY
+
+      - name: Build release artefacts
+        run: |
+          python scripts/validate.py --build --verify-downloads
+
+      - name: Inspect generated .mrpack
+        run: |
+          python - <<'PY'
+          import json, zipfile, pathlib
+          archive = pathlib.Path('releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1.mrpack')
+          with zipfile.ZipFile(archive) as zf:
+              names = zf.namelist()
+              assert 'modrinth.index.json' in names
+              assert 'icon.png' in names
+              index = json.loads(zf.read('modrinth.index.json'))
+              assert index['formatVersion'] == 1
+              assert index['dependencies']['minecraft'] == '1.20.1'
+              assert index['dependencies']['forge'] == '47.4.10'
+          print('Archive inspection passed')
+          PY
+
+      - name: Upload release artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aeronautica-release-artifacts
+          path: |
+            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1.mrpack
+            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1-manual.zip
+            releases/SHA256SUMS
+
+      - name: Upload GitHub Release assets
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1.mrpack
+            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1-manual.zip
+            releases/SHA256SUMS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

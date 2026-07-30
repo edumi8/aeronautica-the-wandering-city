@@ -1,0 +1,568 @@
+{
+  "game": "minecraft",
+  "formatVersion": 1,
+  "versionId": "0.1.0-alpha.1",
+  "name": "Aeronautica: The Wandering City",
+  "summary": "Experimental alpha modpack for Minecraft Java 1.20.1 Forge.",
+  "files": [
+    {
+      "path": "mods/ad_astra-forge-1.20.1-1.15.20.jar",
+      "hashes": {
+        "sha1": "537ac3e358a97efd7b03648a9bfd7b11f1ae7ff7",
+        "sha512": "c7337add217258cea0cb7d9f9136b5a7c8a17600bc2cc9c722321af838690b6c285628dcaebfccedb3e1274683591ef7a45a3514094e5a3bcd8fe1c1f25626bf"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/3ufwT9JF/versions/Qf7QFXk2/ad_astra-forge-1.20.1-1.15.20.jar"
+      ],
+      "fileSize": 7508861
+    },
+    {
+      "path": "mods/appleskin-forge-mc1.20.1-2.5.1.jar",
+      "hashes": {
+        "sha1": "81919356f84eab14258db98924b66c3c38e372b1",
+        "sha512": "3176f928fb6c60d27f5edb610ca4ab0236175404eebf32797a1ec6cdd794bb294a260231579578536d03571377e43c6181adc75d8dd2c0733f17fce4f7e636b9"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/EsAfCjCV/versions/XdXDExVF/appleskin-forge-mc1.20.1-2.5.1.jar"
+      ],
+      "fileSize": 47428
+    },
+    {
+      "path": "mods/architectury-9.2.14-forge.jar",
+      "hashes": {
+        "sha1": "a52918a500ff421180a1cbd1a0cabee712134ec4",
+        "sha512": "cf67f2050cafa00f0bee42e6d7bef77fdb808ac4f71742f7b4d6d5c1e6ffb49561a5a252f332d2b78a9767bdb5faa284611790dba303fbdc736ae36d794f61c7"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1MKTLiiG/architectury-9.2.14-forge.jar"
+      ],
+      "fileSize": 580602
+    },
+    {
+      "path": "mods/botarium-forge-1.20.1-2.3.4.jar",
+      "hashes": {
+        "sha1": "a6928cb03b7c5f81900d3d3c8e8c8f6a89a51a5b",
+        "sha512": "aa3530dde50966e47958690b02a343c4de3782d32ae3b2cb75b2155eebb76e172a292768d846b8d14a97bc9ebe18f1f655eaa3469fce13b2b4b15b16af0aba01"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/2u6LRnMa/versions/O7D6FTfW/botarium-forge-1.20.1-2.3.4.jar"
+      ],
+      "fileSize": 157633
+    },
+    {
+      "path": "mods/clockwork-0.5.6.jar",
+      "hashes": {
+        "sha1": "725fbcf11619ecc206cf6f98cd10c6b4cd1db5d4",
+        "sha512": "73d34a7992cbad877280efc18f520397863b3828b4815a6551bf8120eb7147ee78f65ea14b1cb958c6e219f8f0dbe7a5676af4d7b09c8cc4e31bec824789763c"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/84USeAvk/versions/fYK8BigB/clockwork-0.5.6.jar"
+      ],
+      "fileSize": 11021061
+    },
+    {
+      "path": "mods/Clumps-forge-1.20.1-12.0.0.4.jar",
+      "hashes": {
+        "sha1": "8809c7aa6c71389e9c59abfe5def52c1cb8d4f1c",
+        "sha512": "ffd8ff2438e9f9d260d3926ccdd0cccc4772c6f99f29715690aed4f6e97a76035f3aeaa78168e2a458bc4cccf521e97ebdb6e0b61c819facb04af9ebb3638383"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/Wnxd13zP/versions/nAHGB5ls/Clumps-forge-1.20.1-12.0.0.4.jar"
+      ],
+      "fileSize": 20300
+    },
+    {
+      "path": "mods/Controlling-forge-1.20.1-12.0.2.jar",
+      "hashes": {
+        "sha1": "6195a3d1464f8fb641d7e165163aea1a857ce08e",
+        "sha512": "3945bf3f6d843957f13584dfc70bede253d1e48f0dcb96f647fbcc6fcd3d1748a0dd9c6ca5c882e07a41f98eb84057934f51e43ab6023ed0a19695de2e6fe9f5"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/xv94TkTM/versions/LH6Bi6Am/Controlling-forge-1.20.1-12.0.2.jar"
+      ],
+      "fileSize": 115280
+    },
+    {
+      "path": "mods/create-1.20.1-6.0.8.jar",
+      "hashes": {
+        "sha1": "b13d912b9247a38d66d11598c121442585a1c1e9",
+        "sha512": "5b51f5d31437d9bfbf221b67459abd87260d284874e1e23b7ed1d522b23a48059a3b1d2c1c541428da35dc6be15561b4f3c7f36aac6df3a0e8db6a278f6b0316"
+      },
+      "env": {
+        "client": "optional",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/LNytGWDc/versions/8amzvn9x/create-1.20.1-6.0.8.jar"
+      ],
+      "fileSize": 19170905
+    },
+    {
+      "path": "mods/create-new-age-1.2.0+forge-mc1.20.1.jar",
+      "hashes": {
+        "sha1": "d84322b22219888a55ad0520150ad3ef784d208a",
+        "sha512": "2a24913624febc797275654dd31a6ef0aeb63da71d243b5ab9c58b7fc8e51455f24645bed87ec430bd166c69e23df044dcfcf5fc2bde1d8b7c1c3206724a7a07"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/FTeXqI9v/versions/7vnwbouk/create-new-age-1.2.0%2Bforge-mc1.20.1.jar"
+      ],
+      "fileSize": 1206077
+    },
+    {
+      "path": "mods/cristellib-1.1.6-forge.jar",
+      "hashes": {
+        "sha1": "524ecf0f93f28be2f5db21d87dd81bdbc1a450e1",
+        "sha512": "8d5c8bb59be56c49ef0fcc3593862ad09862210e5099f39bf66c29c73f1b54b637ec6e6fa01b2e1409dafe4cc3e2f2e43d9c6113c78372f49d7c2ff71d056ca0"
+      },
+      "env": {
+        "client": "optional",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/cl223EMc/versions/DOsSK4NK/cristellib-1.1.6-forge.jar"
+      ],
+      "fileSize": 431318
+    },
+    {
+      "path": "mods/embeddium-0.3.31+mc1.20.1.jar",
+      "hashes": {
+        "sha1": "bb2fa8f3e493af16af9160d049f96c614a1faf2f",
+        "sha512": "ffbf2da4685260a4d5c14c621708bd20722563f084f042d3dfb0a7b87f048e39299648c854a93939129da0d23a15a91ec628560d601e76074b08e275f6e132e9"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/sk9rgfiA/versions/UTbfe5d1/embeddium-0.3.31%2Bmc1.20.1.jar"
+      ],
+      "fileSize": 1320675
+    },
+    {
+      "path": "mods/entityculling-forge-1.10.5-mc1.20.1.jar",
+      "hashes": {
+        "sha1": "b818f6d792b79f4ec116c89704e70292bd6f72b5",
+        "sha512": "00f4d6987a7902597e6e3f178f77308d795b2e1c46a2bfdad79f718e8a7417373971b83004cbbe491582d91d1658718187383a368a813af0266ba99804746814"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/NNAgCjsB/versions/MloBcsQQ/entityculling-forge-1.10.5-mc1.20.1.jar"
+      ],
+      "fileSize": 1590221
+    },
+    {
+      "path": "mods/eureka-1201-1.6.0.jar",
+      "hashes": {
+        "sha1": "81dd000d2baa8e9a35f2c4886e3fd54d6910e5c0",
+        "sha512": "d123c8a8026e1e6b093cb8d01efbd34679f0797210c2ff27fe2017b097fe700b5472a02050ae3077ce82a020d3aa278633142dbe8a7dcc6b973c484600a1b54a"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/EO8aSHxh/versions/dWwTr8Ds/eureka-1201-1.6.0.jar"
+      ],
+      "fileSize": 462883
+    },
+    {
+      "path": "mods/FarmersDelight-1.20.1-1.3.2.jar",
+      "hashes": {
+        "sha1": "397763ae36dc2e0f526e0338c875850437580157",
+        "sha512": "3260a78e5d670792923be4d41a7f449aa3f7b4e258f390d4c388d0400e059e2e511d4aa49d9e51d39738a1dbf5507969495c651c7d59736d5b42c3f9691dc3e5"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/R2OftAxM/versions/CsjS7EkP/FarmersDelight-1.20.1-1.3.2.jar"
+      ],
+      "fileSize": 3313327
+    },
+    {
+      "path": "mods/ferritecore-6.0.1-forge.jar",
+      "hashes": {
+        "sha1": "417fb6ce8f52abf40bd9d0390371790f9576f8ba",
+        "sha512": "a1960a7c03dc32d4ccaccaf28afdd9b078758bbd62d15a91d4039a83fa9397a098e89b69591f6bd5190254d9ee97e502504154b9aec764adb8c65f000b75ba2c"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/uXXizFIs/versions/DG5Fn9Sz/ferritecore-6.0.1-forge.jar"
+      ],
+      "fileSize": 123034
+    },
+    {
+      "path": "mods/ImmediatelyFast-Forge-1.5.5+1.20.4.jar",
+      "hashes": {
+        "sha1": "9eacd407b7dea636d375dc47335d92f616484ea2",
+        "sha512": "8fab0605880f6b3875dc6d9d7bc8d69612a3e61a0bfc5adeac3240248715042f04885a09bc4d29383ab809cfc536dff84c6150af56ebd8f08128a1c42909c323"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/5ZwdcRci/versions/rvsLEEZU/ImmediatelyFast-Forge-1.5.5%2B1.20.4.jar"
+      ],
+      "fileSize": 532063
+    },
+    {
+      "path": "mods/Jade-1.20.1-Forge-11.13.3.jar",
+      "hashes": {
+        "sha1": "d08e64e66521d69e083c8525f1fc507f1c202384",
+        "sha512": "72025c4ad6d26522bafe3d5d6ac9d4702c006a868312cb34df8a7a2398a4618205839607b129c167fd176e58cb7655f08e3afbf1993925c80d4fcc559c45a037"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/nvQzSEkH/versions/xJQHCmWJ/Jade-1.20.1-Forge-11.13.3.jar"
+      ],
+      "fileSize": 553487
+    },
+    {
+      "path": "mods/jei-1.20.1-forge-15.21.0.148.jar",
+      "hashes": {
+        "sha1": "87b8f17235fbc5e782ec329ade0d740cfce16f90",
+        "sha512": "2353ebf56afdd512885035a6a688f31934eb08a3c1e9e122237bbc03aaa25863e04d80c8816cbb7115004b551b319e7d5506d0b40617e53aecd31b9eecd93892"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/u6dRKJwZ/versions/QbzBDrjN/jei-1.20.1-forge-15.21.0.148.jar"
+      ],
+      "fileSize": 1426211
+    },
+    {
+      "path": "mods/kotlinforforge-4.12.0-all.jar",
+      "hashes": {
+        "sha1": "962fdb760409d6d71cbf079235f1ca94e3863a22",
+        "sha512": "767f40030ed4b370a3838fa65ae1b79974f31979342fff7cc834a0d5f39eb28612642519352ff2a1dd5226ce1f745f8b3156ee3625ffde01219137d064c1ee40"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/ordsPcFz/versions/Zsh14XeQ/kotlinforforge-4.12.0-all.jar"
+      ],
+      "fileSize": 7442998
+    },
+    {
+      "path": "mods/kubejs-forge-2001.6.5-build.26.jar",
+      "hashes": {
+        "sha1": "8b0cc9797d4ed00fd2d1002d58960af8b32012ae",
+        "sha512": "71ef9e5eb5f3bead86b635b42ad305d075c6487e631217b281d938193dcdc5fe0ff6bae8c86dd4e069726223a66e8690c0610f736c5a62910f60fd80edd575c1"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/umyGl7zF/versions/hVR2xUSr/kubejs-forge-2001.6.5-build.26.jar"
+      ],
+      "fileSize": 1658792
+    },
+    {
+      "path": "mods/lootr-forge-1.20-0.7.35.94.jar",
+      "hashes": {
+        "sha1": "1ec77a7df8adbf3290a296bf25b8f99f37a60020",
+        "sha512": "a04c6371376bfdac2b10cbb2bb9af7ded10ac26faaeb252b59aab2f02c2b2064c2c4ab665fb6ea218243e89d6f237d878c6951638bb948edead2c0a604dd023a"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/EltpO5cN/versions/mWTXC1ZX/lootr-forge-1.20-0.7.35.94.jar"
+      ],
+      "fileSize": 463485
+    },
+    {
+      "path": "mods/modernfix-forge-5.27.66+mc1.20.1.jar",
+      "hashes": {
+        "sha1": "322fdb7aadc06b540cff69a2a0a513bf37050f0f",
+        "sha512": "546eab2906684c463e55e27ff99467ab6ca7a6350803e5ad2c16e25d0eb1187a9ea619ab8a8887af652eeb21e2b1780b6f4957d5151a2b8be92d539feb244ea5"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/nmDcB62a/versions/ZxDvSMHV/modernfix-forge-5.27.66%2Bmc1.20.1.jar"
+      ],
+      "fileSize": 1002234
+    },
+    {
+      "path": "mods/moonlight-1.20-2.16.34-forge.jar",
+      "hashes": {
+        "sha1": "5e20f2f0ce56a534accb32f80853d5a246599a4d",
+        "sha512": "a83c960d783314f1d423a16225f92835429e1276ae0549698cf3560afae8ba05a0c54694e048d3fc05188216414fb268838992e480648e1e568e58c29eb995da"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/twkfQtEc/versions/43kjMXMx/moonlight-1.20-2.16.34-forge.jar"
+      ],
+      "fileSize": 1419416
+    },
+    {
+      "path": "mods/MouseTweaks-forge-mc1.20.1-2.25.1.jar",
+      "hashes": {
+        "sha1": "d751153e722a4e014691c83f39f5b07c6ec5333c",
+        "sha512": "a3bb0272c0a1a3be9250dfee030bb8f86217fa6a32bd534be8c940fdd8c466c800c2df85874877983ced36ecfc28c8ced6c0d42107c1ab621385b4be9a7c65eb"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/aC3cM3Vq/versions/7JVXOe3K/MouseTweaks-forge-mc1.20.1-2.25.1.jar"
+      ],
+      "fileSize": 76237
+    },
+    {
+      "path": "mods/resourcefulconfig-forge-1.20.1-2.1.3.jar",
+      "hashes": {
+        "sha1": "597d40920dcc935f963842c817dcc4901862ab14",
+        "sha512": "2e05fe27529d00d7808a83dbe0c475a0fb96a20ebfd5c9767f4cc8dcd9a865e20a18de41fb9ed710e5cd2e0211c30303b43c1f22702af1d50ee7212ad83a54d3"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/M1953qlQ/versions/DERs8u7v/resourcefulconfig-forge-1.20.1-2.1.3.jar"
+      ],
+      "fileSize": 136923
+    },
+    {
+      "path": "mods/resourcefullib-forge-1.20.1-2.1.29.jar",
+      "hashes": {
+        "sha1": "6fc590a7c56a720fec57e290cbb0a106efbb3ffa",
+        "sha512": "8dbe951d431545a7d18081a8b11a52a248e6d8ff9862ae6462b0f5a6f57ff523af12704c3adb071ae99a7c5c1dd895bd7875dea59f9c4956c1597a668b6e8820"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/G1hIVOrD/versions/OhsHaCcW/resourcefullib-forge-1.20.1-2.1.29.jar"
+      ],
+      "fileSize": 432753
+    },
+    {
+      "path": "mods/rhino-forge-2001.2.3-build.10.jar",
+      "hashes": {
+        "sha1": "c83c9b719a6bab33fbd2b3f2f680eb3adbfc1aa1",
+        "sha512": "4eb6a635f3eff3baa158539bd55344421cf69b15e28f7da8bf55f370a11c071f3525063a6f81b67fbfca550ad8aaab7e6208df87f65ca6ed2851edd46f032b58"
+      },
+      "env": {
+        "client": "optional",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/sk9knFPE/versions/uNALdylI/rhino-forge-2001.2.3-build.10.jar"
+      ],
+      "fileSize": 1798244
+    },
+    {
+      "path": "mods/Searchables-forge-1.20.1-1.0.3.jar",
+      "hashes": {
+        "sha1": "5b976f6e76ec74cdef21865e31f56bcb11558db7",
+        "sha512": "185617d6d446f3d4ef6c7d5c6ee4e2fb731a89f7495157313b21292ec6b8e3dbcc10c0379ab49ecb2d0c64d0a78df74750d7f7336d5e6c43516a7c92f278c0a2"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/fuuu3xnx/versions/PM9yAW1G/Searchables-forge-1.20.1-1.0.3.jar"
+      ],
+      "fileSize": 77732
+    },
+    {
+      "path": "mods/sophisticatedbackpacks-1.20.1-3.24.62.2017.jar",
+      "hashes": {
+        "sha1": "d9c6965c1a072c36ba70442b0337d455a44f1370",
+        "sha512": "e80aca3b06cad1281b6e4b52ff67663db82a710096125964f22e7797cc07f0bcf086fa7e62017f846052fee9fbabd50c60c1064485c6b7e565c0fef8ddf634e5"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/TyCTlI4b/versions/yTarLjsD/sophisticatedbackpacks-1.20.1-3.24.62.2017.jar"
+      ],
+      "fileSize": 1130879
+    },
+    {
+      "path": "mods/sophisticatedcore-1.20.1-1.3.73.2192.jar",
+      "hashes": {
+        "sha1": "6e96eb33414b79d2c44228a76906e15d89e78213",
+        "sha512": "f81496dacd1784f1cbdae05337ef69f2c16173d033c266c27d76ae7711ace91004e19e2f36a9eb8d17ea0c4853b384da36884e26b8aaa394a208f0e555203128"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/nmoqTijg/versions/caACbM4f/sophisticatedcore-1.20.1-1.3.73.2192.jar"
+      ],
+      "fileSize": 1622706
+    },
+    {
+      "path": "mods/Steam_Rails-1.7.2+forge-mc1.20.1.jar",
+      "hashes": {
+        "sha1": "15d317afd2459368b19c23f2bdfefdeb87708bdd",
+        "sha512": "f97597d15e82286dd6425795c49b53b85f2cad7e97d8103cb21b4fa6375c4db6df34b2a732097bd451963790d6bad53bdc11b427a7d5d20bd9f03ed708443973"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/ZzjhlDgM/versions/I6GhUCyk/Steam_Rails-1.7.2%2Bforge-mc1.20.1.jar"
+      ],
+      "fileSize": 16819720
+    },
+    {
+      "path": "mods/supplementaries-1.20-3.1.43-forge.jar",
+      "hashes": {
+        "sha1": "326d65a29981de28016e3828370d68a8f63e1798",
+        "sha512": "70faa19266ffd70787f6484aa1ab5cbea69c9f39af36faebb6534eeb2123e333c5b39df06a151b52d78d701a037a36adc53eb5aa51a6710096e6ee216b45d59c"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/fFEIiSDQ/versions/S0TIJ1hU/supplementaries-1.20-3.1.43-forge.jar"
+      ],
+      "fileSize": 13667742
+    },
+    {
+      "path": "mods/Terralith_1.20.x_v2.5.4.jar",
+      "hashes": {
+        "sha1": "79e1409b8db4ce86df9d6d6730f09c4bd8860a30",
+        "sha512": "885e171d8b34aae7e142f082d0364285ec5a8e8342f11c60d341f7a94083d5a42c4e30612fe4f9f64d57b484396a3dff3a224e2a2497d4ced8d22f2ad6cd561d"
+      },
+      "env": {
+        "client": "optional",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/8oi3bsk5/versions/WeYhEb5d/Terralith_1.20.x_v2.5.4.jar"
+      ],
+      "fileSize": 3156901
+    },
+    {
+      "path": "mods/Towns-and-Towers-1.12-Fabric+Forge.jar",
+      "hashes": {
+        "sha1": "5a28ec56457cf1bf154e993cf73dba0428a7921b",
+        "sha512": "ed734046c356bb996b628c2e0c47e64ba598c87016591fd77533069de68f27b8bfdcd2173d7d3db97f1981ebb806133c3d1751c330d539ade3d6c37ed2d5598f"
+      },
+      "env": {
+        "client": "optional",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/DjLobEOy/versions/7ZwnSrVW/Towns-and-Towers-1.12-Fabric%2BForge.jar"
+      ],
+      "fileSize": 2864275
+    },
+    {
+      "path": "mods/valkyrienskies-120-2.4.5.jar",
+      "hashes": {
+        "sha1": "e69a64ecf15c2235649a949ae2fbebf17611e7ea",
+        "sha512": "ad6d4d683f68712fd72b947be40b01a54520528b4e43737c2e7b913b3bea1ea63d1be0c2926a47e3ab9216c7a095d33bde56fee192cee1874efefa8a01e3db67"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/V5ujR2yw/versions/nFABSxad/valkyrienskies-120-2.4.5.jar"
+      ],
+      "fileSize": 23949819
+    },
+    {
+      "path": "mods/xaerominimap-forge-1.20.1-26.4.2.jar",
+      "hashes": {
+        "sha1": "8f5f747a33e787aaa3827b00eb0ad098966499ff",
+        "sha512": "6bf30d544f79e7ecf0a2522c1294cb8bbb1eaf731f428b1ae10edce20d0eacf831f407625c844bf4ee84816a78897a206e59525a0fb4722c4081d330b0c12500"
+      },
+      "env": {
+        "client": "required",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/1bokaNcj/versions/A1JacFsh/xaerominimap-forge-1.20.1-26.4.2.jar"
+      ],
+      "fileSize": 2195245
+    },
+    {
+      "path": "mods/xaeroworldmap-forge-1.20.1-1.44.2.jar",
+      "hashes": {
+        "sha1": "d7cd24554d9c361b2d8d3efac2cb1408f118917d",
+        "sha512": "5df9413dcf94d80247fa5a427eec3a8058434978f918b1d5e99f5f07cdcca02c47e664de84e3b0060af22aaced9d54a24827350a950337a431330d07f96b3095"
+      },
+      "env": {
+        "client": "required",
+        "server": "optional"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/NcUtCpym/versions/kQ06HixR/xaeroworldmap-forge-1.20.1-1.44.2.jar"
+      ],
+      "fileSize": 1421224
+    }
+  ],
+  "dependencies": {
+    "minecraft": "1.20.1",
+    "forge": "47.4.10"
+  }
+}
