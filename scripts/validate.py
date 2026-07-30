@@ -14,6 +14,9 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from aeronautica_testing.compat import verify_core_compatibility as _verify_core_compatibility  # noqa: E402
+
 API = "https://api.modrinth.com/v2"
 USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.3 (build validator)"
 
@@ -23,7 +26,34 @@ INDEX_PATH = ROOT / "modpack" / "modrinth.index.json"
 ICON_PATH = ROOT / "modpack" / "icon.png"
 OVERRIDES_PATH = ROOT / "overrides"
 RELEASES_PATH = ROOT / "releases"
-EXPECTED_MOD_COUNT = 38
+
+# Fixed archive timestamp/permissions so two builds of identical logical
+# content produce byte-identical .mrpack/.zip files regardless of when or on
+# which OS they were built. Honors SOURCE_DATE_EPOCH
+# (https://reproducible-builds.org/docs/source-date-epoch/) when set.
+_FILE_EXTERNAL_ATTR = 0o644 << 16
+
+
+def _reproducible_date_time() -> tuple[int, int, int, int, int, int]:
+    epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if epoch:
+        import time
+
+        return tuple(time.gmtime(int(epoch))[:6])  # type: ignore[return-value]
+    return (2020, 1, 1, 0, 0, 0)
+
+
+def _write_deterministic(archive: zipfile.ZipFile, arcname: str, data: bytes) -> None:
+    info = zipfile.ZipInfo(arcname, date_time=_reproducible_date_time())
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = _FILE_EXTERNAL_ATTR
+    archive.writestr(info, data)
+
+
+def _iter_sorted_files(base: Path):
+    for path in sorted(base.rglob("*")):
+        if path.is_file():
+            yield path
 
 
 def request_json(url: str) -> Any:
@@ -35,6 +65,28 @@ def request_json(url: str) -> Any:
 def open_response(url: str) -> urllib.response.addinfourl:
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     return urllib.request.urlopen(request, timeout=180)
+
+
+def _report_resolved_count_drift(new_count: int) -> None:
+    """The set of resolved mod files is never hard-coded (see repository
+    invariants); instead a run that changes the count is surfaced as an
+    informational note derived from whatever modrinth.index.json already
+    contains on disk, so drift is visible without blocking legitimate
+    mod additions/removals.
+    """
+    if not INDEX_PATH.exists():
+        return
+    try:
+        previous_index = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    previous_count = len(previous_index.get("files", []))
+    if previous_count and previous_count != new_count:
+        print(
+            f"NOTE: resolved mod file count changed from {previous_count} to {new_count} "
+            "(dependency resolution drift -- review before releasing).",
+            file=sys.stderr,
+        )
 
 
 def load_manifest() -> dict[str, Any]:
@@ -96,24 +148,6 @@ def hash_remote_file(url: str) -> tuple[str, int]:
             digest.update(chunk)
             total += len(chunk)
     return digest.hexdigest(), total
-
-
-def verify_core_compatibility(selected_by_slug: dict[str, dict[str, Any]]) -> None:
-    clockwork = selected_by_slug.get("create-clockwork")
-    valkyrien_skies = selected_by_slug.get("valkyrien-skies")
-    
-    if clockwork and valkyrien_skies:
-        clockwork_version = clockwork.get("version_number", "")
-        vs_version = valkyrien_skies.get("version_number", "")
-        if "0.5.6" in clockwork_version:
-            if "2.4." in vs_version:
-                vs_minor = int(vs_version.split("2.4.")[1].split(".")[0])
-                if vs_minor < 6:
-                    raise RuntimeError(
-                        f"Incompatible mod versions: Clockwork 0.5.6 requires Valkyrien Skies 2.4.6 or above, "
-                        f"but you have Valkyrien Skies {vs_version}. "
-                        f"The pinned versions must be updated together."
-                    )
 
 
 def verify_structure(manifest: dict[str, Any]) -> None:
@@ -184,7 +218,8 @@ def build_resolved_manifest(manifest: dict[str, Any], verify_downloads: bool) ->
         version = select_version(source_mod["slug"], source_mod.get("version"))
         register_version(version, source_mod["slug"])
 
-    verify_core_compatibility(selected_by_slug)
+    versions_by_slug = {slug: version.get("version_number", "") for slug, version in selected_by_slug.items()}
+    _verify_core_compatibility(versions_by_slug, explicit_pins)
 
     resolved_mods: list[dict[str, Any]] = []
     for slug, version in selected_by_slug.items():
@@ -221,8 +256,9 @@ def build_resolved_manifest(manifest: dict[str, Any], verify_downloads: bool) ->
             }
         )
 
-    if len(resolved_mods) != EXPECTED_MOD_COUNT:
-        raise RuntimeError(f"Expected {EXPECTED_MOD_COUNT} resolved mod files, found {len(resolved_mods)}")
+    if not resolved_mods:
+        raise RuntimeError("Dependency resolution produced zero mod files.")
+    _report_resolved_count_drift(len(resolved_mods))
 
     resolved_mods.sort(key=lambda item: item["path"].lower())
     resolved_manifest = dict(manifest)
@@ -251,39 +287,35 @@ def build_resolved_manifest(manifest: dict[str, Any], verify_downloads: bool) ->
     return resolved_manifest, index
 
 
-def write_release_archive(index: dict[str, Any], release_name: str) -> Path:
-    RELEASES_PATH.mkdir(parents=True, exist_ok=True)
-    mrpack_path = RELEASES_PATH / f"{release_name}.mrpack"
+def write_release_archive(index: dict[str, Any], release_name: str, output_dir: Path = RELEASES_PATH) -> Path:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    mrpack_path = output_dir / f"{release_name}.mrpack"
     with zipfile.ZipFile(mrpack_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr("modrinth.index.json", json.dumps(index, indent=2, ensure_ascii=False) + "\n")
-        archive.write(ICON_PATH, "icon.png")
-        for base, _, files in os.walk(OVERRIDES_PATH):
-            for filename in files:
-                source = Path(base) / filename
-                relative = source.relative_to(OVERRIDES_PATH).as_posix()
-                archive.write(source, f"overrides/{relative}")
+        _write_deterministic(archive, "modrinth.index.json", (json.dumps(index, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+        _write_deterministic(archive, "icon.png", ICON_PATH.read_bytes())
+        for source in _iter_sorted_files(OVERRIDES_PATH):
+            relative = source.relative_to(OVERRIDES_PATH).as_posix()
+            _write_deterministic(archive, f"overrides/{relative}", source.read_bytes())
     return mrpack_path
 
 
-def write_manual_zip(release_name: str, index: dict[str, Any]) -> Path:
-    RELEASES_PATH.mkdir(parents=True, exist_ok=True)
-    zip_path = RELEASES_PATH / f"{release_name}-manual.zip"
+def write_manual_zip(release_name: str, index: dict[str, Any], output_dir: Path = RELEASES_PATH) -> Path:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = output_dir / f"{release_name}-manual.zip"
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr("modrinth.index.json", json.dumps(index, indent=2, ensure_ascii=False) + "\n")
-        archive.write(MANIFEST_PATH, "manifest.json")
-        archive.write(ICON_PATH, "icon.png")
-        for base, _, files in os.walk(OVERRIDES_PATH):
-            for filename in files:
-                source = Path(base) / filename
-                relative = source.relative_to(OVERRIDES_PATH).as_posix()
-                archive.write(source, f"overrides/{relative}")
+        _write_deterministic(archive, "modrinth.index.json", (json.dumps(index, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+        _write_deterministic(archive, "manifest.json", MANIFEST_PATH.read_bytes())
+        _write_deterministic(archive, "icon.png", ICON_PATH.read_bytes())
+        for source in _iter_sorted_files(OVERRIDES_PATH):
+            relative = source.relative_to(OVERRIDES_PATH).as_posix()
+            _write_deterministic(archive, f"overrides/{relative}", source.read_bytes())
     return zip_path
 
 
-def write_sha256_sums(artefacts: list[Path]) -> Path:
-    sha_path = RELEASES_PATH / "SHA256SUMS"
+def write_sha256_sums(artefacts: list[Path], output_dir: Path = RELEASES_PATH) -> Path:
+    sha_path = output_dir / "SHA256SUMS"
     lines = []
-    for artefact in artefacts:
+    for artefact in sorted(artefacts, key=lambda p: p.name):
         digest = hashlib.sha256(artefact.read_bytes()).hexdigest()
         lines.append(f"{digest}  {artefact.name}")
     sha_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -294,6 +326,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Validate and build the Aeronautica Modrinth pack.")
     parser.add_argument("--build", action="store_true", help="Write modpack/modrinth.index.json and build the release artefacts")
     parser.add_argument("--verify-downloads", action="store_true", help="Download every file and verify its SHA-512 checksum against Modrinth")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=RELEASES_PATH,
+        help="Directory to write the .mrpack/manual zip/SHA256SUMS into (default: releases/). "
+        "Used by the reproducible-build test to build twice into isolated directories.",
+    )
     args = parser.parse_args()
 
     manifest = load_manifest()
@@ -307,9 +346,9 @@ def main() -> int:
 
     if args.build:
         release_name = f"{manifest['name'].replace(':', '').replace(' ', '-')}-{manifest['version']}"
-        mrpack_path = write_release_archive(index, release_name)
-        manual_zip_path = write_manual_zip(release_name, index)
-        sha_path = write_sha256_sums([mrpack_path, manual_zip_path])
+        mrpack_path = write_release_archive(index, release_name, output_dir=args.output_dir)
+        manual_zip_path = write_manual_zip(release_name, index, output_dir=args.output_dir)
+        sha_path = write_sha256_sums([mrpack_path, manual_zip_path], output_dir=args.output_dir)
         print(f"Built {mrpack_path}")
         print(f"Built {manual_zip_path}")
         print(f"Wrote {sha_path}")

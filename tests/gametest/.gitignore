@@ -1,0 +1,14 @@
+# Gradle / ForgeGradle build state -- never commit, always regenerable.
+.gradle/
+build/
+run/
+logs/
+eclipse/
+.idea/
+*.iml
+out/
+
+# Staged production mod jars (tools/stage_jars.py) -- always gitignored,
+# see repository invariant "never commit downloaded Minecraft files or mod
+# JARs".
+.staged-mods/

@@ -1,0 +1,7 @@
+# Pinned test-only dependencies for the Aeronautica test pipeline.
+# Never referenced by the shipped modpack itself -- installed only to run
+# scripts/test_pipeline.py locally or in CI. See TESTING.md.
+#
+# Resolved against PyPI on 2026-07-30.
+pytest==9.1.1
+minecraft-launcher-lib==8.0

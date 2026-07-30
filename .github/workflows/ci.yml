@@ -1,0 +1,209 @@
+name: ci
+
+# PR/push testing (Phase 10 "Pull request/push CI"). Nightly reuses these
+# same jobs via workflow_call from nightly.yml -- see TESTING.md
+# "GitHub workflow triggers" for why there is deliberately no separate
+# CI-only test logic: every job below just invokes
+# scripts/test_pipeline.py, identically to a local run.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  python-unit-tests:
+    name: Python unit tests + validator
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r tests/requirements.txt
+      - run: python -m compileall scripts/aeronautica_testing scripts/validate.py scripts/test_pipeline.py install.py
+      - run: python -m pytest tests/unit -q
+      - name: fast suite (manifest/compat/pytest/existing-artifact structure)
+        run: python scripts/test_pipeline.py fast --output-dir test-results
+      - name: Upload test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-fast-ubuntu-${{ github.sha }}
+          path: test-results/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  build-and-validate:
+    name: Build + static/hash/reproducible-build validation
+    needs: python-unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r tests/requirements.txt
+      - name: Cache mod/tool downloads
+        uses: actions/cache@v4
+        with:
+          path: .cache/aeronautica-test-downloads
+          key: aeronautica-downloads-${{ hashFiles('modpack/manifest.json') }}-mc1.20.1-forge47.4.10
+          restore-keys: |
+            aeronautica-downloads-
+      - name: artifact suite (build, structure, downloads, Modrinth hashes, sha256, independent install, reproducible build)
+        run: python scripts/test_pipeline.py artifact --output-dir test-results
+      - name: Upload built .mrpack/manual zip/SHA256SUMS for downstream jobs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mrpack-build-${{ github.sha }}
+          path: releases/**
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-artifact-ubuntu-${{ github.sha }}
+          path: test-results/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  install-ubuntu:
+    name: Independent .mrpack install (Ubuntu)
+    needs: build-and-validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r tests/requirements.txt
+      - name: Download the exact artifact the build job produced
+        uses: actions/download-artifact@v4
+        with:
+          name: mrpack-build-${{ github.sha }}
+          path: releases
+      - name: artifact suite --skip-build (structure + independent install only)
+        run: python scripts/test_pipeline.py artifact --skip-build --output-dir test-results
+      - name: Upload test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-install-ubuntu-${{ github.sha }}
+          path: test-results/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  install-windows:
+    name: Independent .mrpack install (Windows)
+    needs: build-and-validate
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r tests/requirements.txt
+      - name: Download the exact artifact the build job produced
+        uses: actions/download-artifact@v4
+        with:
+          name: mrpack-build-${{ github.sha }}
+          path: releases
+      - name: artifact suite --skip-build (structure + independent install only)
+        run: python scripts/test_pipeline.py artifact --skip-build --output-dir test-results
+      - name: Upload test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-install-windows-${{ github.sha }}
+          path: test-results/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  client-smoke:
+    name: Java 17 client smoke test (Linux/Xvfb)
+    needs: build-and-validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r tests/requirements.txt
+      - name: Install Xvfb + software OpenGL
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb mesa-utils libgl1-mesa-dri libgl1
+      - name: Download the exact artifact the build job produced
+        uses: actions/download-artifact@v4
+        with:
+          name: mrpack-build-${{ github.sha }}
+          path: releases
+      - name: Cache client downloads (Forge/HeadlessMC/mc-runtime-test/vanilla assets)
+        uses: actions/cache@v4
+        with:
+          path: .cache/aeronautica-test-downloads
+          key: aeronautica-client-${{ hashFiles('modpack/manifest.json') }}-mc1.20.1-forge47.4.10-java17-${{ runner.os }}
+      - name: client suite
+        run: python scripts/test_pipeline.py client --output-dir test-results
+      - name: Upload test-results (logs, crash reports, screenshot)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-client-ubuntu-mc1.20.1-forge47.4.10-${{ github.sha }}
+          path: test-results/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  server-smoke:
+    name: Java 17 dedicated server smoke test (Docker)
+    needs: build-and-validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r tests/requirements.txt
+      - name: Download the exact artifact the build job produced
+        uses: actions/download-artifact@v4
+        with:
+          name: mrpack-build-${{ github.sha }}
+          path: releases
+      - name: server suite
+        run: python scripts/test_pipeline.py server --output-dir test-results
+      - name: Upload test-results (container logs, RCON transcript, crash reports)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-server-ubuntu-mc1.20.1-forge47.4.10-${{ github.sha }}
+          path: test-results/**
+          if-no-files-found: warn
+          retention-days: 14

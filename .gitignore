@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+.pytest_cache/
 build.log
 *.log
 *.part
@@ -15,3 +16,10 @@ releases/SHA256SUMS
 .minecraft/
 *.iml
 .idea/
+
+# Test pipeline output and shared download cache (scripts/test_pipeline.py
+# --output-dir/--cache-dir default to test-results/ and .cache/, but ad hoc
+# manual runs sometimes use a suffixed dir, e.g. test-results-server/) --
+# always regenerable, never a second source of truth.
+/test-results*/
+/.cache/

@@ -1,0 +1,197 @@
+{
+  "_generated_by": "scripts/aeronautica_testing/tools/extract_registry_facts.py",
+  "_source": "Enumerated directly from the pinned mod jars in modpack/manifest.json resolved_mods (sha512-addressed). Every ID below was found verbatim as a blockstate/item-model/dimension file inside the shipped jar -- none were guessed.",
+  "mods": {
+    "ad-astra": {
+      "mod_id": "ad_astra",
+      "source_jar_sha512": "c7337add217258cea0cb7d9f9136b5a7c8a17600bc2cc9c722321af838690b6c285628dcaebfccedb3e1274683591ef7a45a3514094e5a3bcd8fe1c1f25626bf",
+      "total_blocks_found": 333,
+      "total_items_found": 413,
+      "curated_blocks": [
+        "ad_astra:compressor",
+        "ad_astra:encased_steel_block",
+        "ad_astra:gravity_normalizer",
+        "ad_astra:launch_pad",
+        "ad_astra:oxygen_distributor",
+        "ad_astra:steel_block"
+      ],
+      "curated_items": [],
+      "curated_dimensions": [
+        "ad_astra:glacio",
+        "ad_astra:glacio_orbit",
+        "ad_astra:mars",
+        "ad_astra:mars_orbit",
+        "ad_astra:mercury",
+        "ad_astra:mercury_orbit",
+        "ad_astra:moon",
+        "ad_astra:moon_orbit",
+        "ad_astra:venus",
+        "ad_astra:venus_orbit"
+      ]
+    },
+    "amendments": {
+      "mod_id": "amendments",
+      "source_jar_sha512": "7f1ebaefc4d71e523e92acd5e7b255695c7248695f9c89c393527146128c2780c4cdc079e3982485309dbf2a093dedd0a42177bed8242b641fd77692f211ef34",
+      "total_blocks_found": 34,
+      "total_items_found": 2,
+      "curated_blocks": [
+        "amendments:hanging_flower_pot",
+        "amendments:skull_candle",
+        "amendments:skull_candle_soul",
+        "amendments:skull_candle_soul_wall",
+        "amendments:skull_candle_wall",
+        "amendments:skull_pile",
+        "amendments:wall_lantern"
+      ],
+      "curated_items": [],
+      "curated_dimensions": []
+    },
+    "create": {
+      "mod_id": "create",
+      "source_jar_sha512": "5b51f5d31437d9bfbf221b67459abd87260d284874e1e23b7ed1d522b23a48059a3b1d2c1c541428da35dc6be15561b4f3c7f36aac6df3a0e8db6a278f6b0316",
+      "total_blocks_found": 643,
+      "total_items_found": 766,
+      "curated_blocks": [
+        "create:andesite_encased_cogwheel",
+        "create:andesite_encased_large_cogwheel",
+        "create:andesite_encased_shaft",
+        "create:brass_encased_cogwheel",
+        "create:brass_encased_large_cogwheel",
+        "create:brass_encased_shaft",
+        "create:cogwheel",
+        "create:creative_motor",
+        "create:gantry_shaft",
+        "create:gearbox",
+        "create:large_cogwheel",
+        "create:large_water_wheel",
+        "create:mechanical_press",
+        "create:metal_girder_encased_shaft",
+        "create:powered_shaft",
+        "create:shaft",
+        "create:water_wheel",
+        "create:water_wheel_structure"
+      ],
+      "curated_items": [],
+      "curated_dimensions": []
+    },
+    "create-clockwork": {
+      "mod_id": "vs_clockwork",
+      "source_jar_sha512": "73d34a7992cbad877280efc18f520397863b3828b4815a6551bf8120eb7147ee78f65ea14b1cb958c6e219f8f0dbe7a5676af4d7b09c8cc4e31bec824789763c",
+      "total_blocks_found": 73,
+      "total_items_found": 128,
+      "curated_blocks": [
+        "vs_clockwork:brass_propeller_bearing",
+        "vs_clockwork:combustion_engine",
+        "vs_clockwork:gas_engine",
+        "vs_clockwork:gas_thruster",
+        "vs_clockwork:juryrigged_propeller_bearing",
+        "vs_clockwork:propeller_bearing"
+      ],
+      "curated_items": [],
+      "curated_dimensions": []
+    },
+    "create-new-age": {
+      "mod_id": "create_new_age",
+      "source_jar_sha512": "2a24913624febc797275654dd31a6ef0aeb63da71d243b5ab9c58b7fc8e51455f24645bed87ec430bd166c69e23df044dcfcf5fc2bde1d8b7c1c3206724a7a07",
+      "total_blocks_found": 36,
+      "total_items_found": 54,
+      "curated_blocks": [
+        "create_new_age:advanced_energiser",
+        "create_new_age:basic_motor",
+        "create_new_age:basic_motor_extension",
+        "create_new_age:copper_wire_block"
+      ],
+      "curated_items": [],
+      "curated_dimensions": []
+    },
+    "eureka": {
+      "mod_id": "vs_eureka",
+      "source_jar_sha512": "7ab6b0f3aa81e572efbb8f0b109c0a8852c4f145f467ce3903e2336d782d81fc9fe5cf2c8a14edb508f92a613def5e47680e370cdaef80956d436920343b89d4",
+      "total_blocks_found": 30,
+      "total_items_found": 29,
+      "curated_blocks": [
+        "vs_eureka:anchor",
+        "vs_eureka:ballast",
+        "vs_eureka:balloon",
+        "vs_eureka:black_balloon",
+        "vs_eureka:blue_balloon",
+        "vs_eureka:brown_balloon",
+        "vs_eureka:cyan_balloon",
+        "vs_eureka:dark_oak_ship_helm",
+        "vs_eureka:engine",
+        "vs_eureka:gray_balloon",
+        "vs_eureka:green_balloon",
+        "vs_eureka:light_blue_balloon",
+        "vs_eureka:light_gray_balloon",
+        "vs_eureka:lime_balloon",
+        "vs_eureka:magenta_balloon",
+        "vs_eureka:oak_ship_helm",
+        "vs_eureka:orange_balloon",
+        "vs_eureka:pink_balloon",
+        "vs_eureka:purple_balloon",
+        "vs_eureka:red_balloon",
+        "vs_eureka:white_balloon",
+        "vs_eureka:yellow_balloon"
+      ],
+      "curated_items": [],
+      "curated_dimensions": []
+    },
+    "supplementaries": {
+      "mod_id": "supplementaries",
+      "source_jar_sha512": "70faa19266ffd70787f6484aa1ab5cbea69c9f39af36faebb6534eeb2123e333c5b39df06a151b52d78d701a037a36adc53eb5aa51a6710096e6ee216b45d59c",
+      "total_blocks_found": 231,
+      "total_items_found": 284,
+      "curated_blocks": [
+        "supplementaries:bellows",
+        "supplementaries:candle_holder",
+        "supplementaries:candle_holder_black",
+        "supplementaries:candle_holder_blue",
+        "supplementaries:candle_holder_brown",
+        "supplementaries:candle_holder_cupric",
+        "supplementaries:candle_holder_cyan",
+        "supplementaries:candle_holder_ender",
+        "supplementaries:candle_holder_gray",
+        "supplementaries:candle_holder_green",
+        "supplementaries:candle_holder_light_blue",
+        "supplementaries:candle_holder_light_gray",
+        "supplementaries:candle_holder_lime",
+        "supplementaries:candle_holder_magenta",
+        "supplementaries:candle_holder_orange",
+        "supplementaries:candle_holder_pink",
+        "supplementaries:candle_holder_purple",
+        "supplementaries:candle_holder_red",
+        "supplementaries:candle_holder_soul",
+        "supplementaries:candle_holder_spectacle",
+        "supplementaries:candle_holder_white",
+        "supplementaries:candle_holder_yellow",
+        "supplementaries:clock_block",
+        "supplementaries:sign_post",
+        "supplementaries:sign_post_wall"
+      ],
+      "curated_items": [],
+      "curated_dimensions": []
+    },
+    "valkyrien-skies": {
+      "mod_id": "valkyrienskies",
+      "source_jar_sha512": "6a0d959ed4bf76f08dcad0e6a360bda842d85386a05f510069eafbcc6b46b4216cdcfd9e377f82e4266b0f07e6b74118d8382af0bafcbdd65712f8a92f16e146",
+      "total_blocks_found": 6,
+      "total_items_found": 13,
+      "curated_blocks": [
+        "valkyrienskies:test_antigrav",
+        "valkyrienskies:test_chair",
+        "valkyrienskies:test_flap",
+        "valkyrienskies:test_hinge",
+        "valkyrienskies:test_thruster",
+        "valkyrienskies:test_wing"
+      ],
+      "curated_items": [
+        "valkyrienskies:area_assembler",
+        "valkyrienskies:ship_assembler",
+        "valkyrienskies:ship_creator",
+        "valkyrienskies:ship_creator_smaller",
+        "valkyrienskies:ship_remover"
+      ],
+      "curated_dimensions": []
+    }
+  }
+}

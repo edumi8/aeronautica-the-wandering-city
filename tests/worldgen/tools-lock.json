@@ -1,0 +1,31 @@
+{
+  "_source": "Resolved via the official Modrinth API (GET /v2/project/<id>/version?loaders=[\"forge\"]&game_versions=[\"1.20.1\"]) on 2026-07-30. Test-only tools -- must never be added to modpack/manifest.json or ship in a release artifact.",
+  "minecraft": "1.20.1",
+  "loader": "forge",
+  "tools": {
+    "chunky": {
+      "project_id": "fALzjamp",
+      "project_title": "Chunky",
+      "modrinth_url": "https://modrinth.com/plugin/chunky",
+      "version_id": "4FTDk9wv",
+      "version_number": "1.3.146",
+      "filename": "Chunky-1.3.146.jar",
+      "download_url": "https://cdn.modrinth.com/data/fALzjamp/versions/4FTDk9wv/Chunky-1.3.146.jar",
+      "sha1": "0b782d12b4ac3b03a94c28f32e9b2d5587d1dd50",
+      "sha512": "13ef9d5bfea1895118eec45aa3071e2d79408241f29990624f67e157d4c525391753b0a1539ff3359dad79a6e5ab5e0b84fffbe528bdefcaaefd579ec794d9c9",
+      "file_size": 341451
+    },
+    "spark": {
+      "project_id": "l6YH9Als",
+      "project_title": "spark",
+      "modrinth_url": "https://modrinth.com/plugin/spark",
+      "version_id": "4FXHDE9F",
+      "version_number": "1.10.53-forge",
+      "filename": "spark-1.10.53-forge.jar",
+      "download_url": "https://cdn.modrinth.com/data/l6YH9Als/versions/4FXHDE9F/spark-1.10.53-forge.jar",
+      "sha1": "231fb325368c0660954f47bfb03493f5246fa4d1",
+      "sha512": "15c6a3753dcba380624643a1e19c856240e8f6bed280f908e1be12c6154a86284ac86405c806273842975e0b7270af93ea9b1db5cf575a3853e54e1088cf7343",
+      "file_size": 3114590
+    }
+  }
+}

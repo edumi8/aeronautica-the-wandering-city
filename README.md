@@ -113,6 +113,20 @@ or:
 
 The build validates the JSON and repository layout, resolves the Modrinth dependency graph, verifies every downloaded file and SHA-512 checksum, generates the Modrinth index, and writes the .mrpack, manual ZIP, and SHA256SUMS artefacts under releases/.
 
+## Testing
+
+A single Python implementation drives every test suite, locally and in GitHub Actions -- see [TESTING.md](TESTING.md) for the full reference and [docs/RELEASE_TEST_CHECKLIST.md](docs/RELEASE_TEST_CHECKLIST.md) for the release sign-off checklist.
+
+```bash
+python scripts/test_pipeline.py fast       # static checks + unit tests, seconds, no network
+python scripts/test_pipeline.py artifact   # build + deep structural/hash/reproducibility validation
+python scripts/test_pipeline.py server     # dedicated server smoke test (needs Docker)
+python scripts/test_pipeline.py client     # real Forge client smoke test (needs Java 17 + Linux/Xvfb or Docker)
+python scripts/test_pipeline.py full       # everything
+```
+
+or `./scripts/test.sh <suite>` / `.\scripts\test.ps1 <suite>`. Pull requests run static validation, build/reproducibility checks, independent installs on Ubuntu and Windows, and Java 17 client/server smoke tests; a nightly workflow additionally runs Forge GameTests and a worldgen/performance sweep. Java 17 and Forge 47.4.10 are the release-gating versions everywhere in the pipeline.
+
 ## Performance recommendations for the moving city
 
 - Use Java 17 (required)
@@ -148,4 +162,3 @@ Contributions are welcome. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for the
 ## License
 
 This project is distributed under the MIT License. See [LICENSE](LICENSE) for details.
-

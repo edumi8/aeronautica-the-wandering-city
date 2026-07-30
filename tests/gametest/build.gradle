@@ -1,0 +1,97 @@
+// Development-only Forge GameTest project (Phase 7). Never built into, or
+// shipped as part of, the release .mrpack -- see ../../TESTING.md.
+//
+// Forge disables GameTests in production mode (see
+// ForgeGameTestHooks#ENABLE_GAMETEST, linked from TESTING.md), so this must
+// be a real ForgeGradle userdev project running `runGameTestServer`, not a
+// QA jar injected into the release pack.
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+version = mod_version
+group = 'com.aeronautica.gametest'
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty('java.version')}, JVM: ${System.getProperty('java.vm.version')} (${System.getProperty('java.vendor')})"
+
+minecraft {
+    mappings channel: 'official', version: mc_version
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            // Only our own namespace's tests run -- staged third-party mods
+            // are loaded for realism but never contribute GameTests.
+            property 'forge.enabledGameTestNamespaces', mod_id
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            property 'forge.enableGameTest', 'true'
+        }
+
+        server {
+            property 'forge.enableGameTest', 'true'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.minecraftforge.net/' }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+
+    // Every jar staged by tools/stage_jars.py (run that first) -- the exact
+    // production mods resolved into modpack/manifest.json, deobfuscated via
+    // ForgeGradle's userdev remapper so test code can reference their public
+    // registries/classes. See "How to add a GameTest" in ../../TESTING.md.
+    def stagedModsDir = file('.staged-mods')
+    if (stagedModsDir.exists()) {
+        fileTree(dir: stagedModsDir, include: '*.jar').forEach { jarFile ->
+            implementation fg.deobf(files(jarFile.absolutePath))
+        }
+    } else {
+        logger.warn(
+            "tests/gametest/.staged-mods is empty -- run 'python tools/stage_jars.py' " +
+            "before building, or the GameTest server will boot with only this test mod loaded."
+        )
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+        minecraft_version: mc_version,
+        minecraft_version_range: mc_version_range,
+        forge_version: forge_version,
+        forge_version_range: forge_version_range,
+        loader_version_range: loader_version_range,
+        mod_id: mod_id,
+        mod_version: mod_version,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+// The gametest_runner.py driver enforces "fail if zero tests are
+// discovered" / "minimum expected test count" by parsing this task's
+// output -- see scripts/aeronautica_testing/gametest_runner.py.

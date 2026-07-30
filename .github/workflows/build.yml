@@ -1,19 +1,31 @@
 name: build
 
+# Release-artefact publishing only. Push/PR validation (including a build +
+# full static/download/hash/reproducible-build check of this exact logic)
+# now lives in ci.yml -- see that file's header comment for why the two are
+# not allowed to diverge. This workflow is intentionally narrow: it exists
+# to attach release artefacts to a tag, and it never runs the heavier
+# suites (that already happened on the commit before the tag was pushed).
+
 on:
   push:
-    branches:
-      - '**'
     tags:
       - 'v*'
-  pull_request:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # only this job, only to attach release assets on a tag push
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,16 +56,23 @@ jobs:
         run: |
           python - <<'PY'
           import json, zipfile, pathlib
-          archive = pathlib.Path('releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1.mrpack')
+
+          manifest = json.loads(pathlib.Path('modpack/manifest.json').read_text(encoding='utf-8'))
+          release_name = f"{manifest['name'].replace(':', '').replace(' ', '-')}-{manifest['version']}"
+          archive = pathlib.Path('releases') / f'{release_name}.mrpack'
+
           with zipfile.ZipFile(archive) as zf:
               names = zf.namelist()
-              assert 'modrinth.index.json' in names
+              assert names.count('modrinth.index.json') == 1
               assert 'icon.png' in names
               index = json.loads(zf.read('modrinth.index.json'))
               assert index['formatVersion'] == 1
               assert index['dependencies']['minecraft'] == '1.20.1'
               assert index['dependencies']['forge'] == '47.4.10'
-          print('Archive inspection passed')
+
+          print(f'Archive inspection passed: {archive} ({len(index["files"])} mod files)')
+          with open('release_name.txt', 'w', encoding='utf-8') as fh:
+              fh.write(release_name)
           PY
 
       - name: Upload release artefacts
@@ -61,17 +80,20 @@ jobs:
         with:
           name: aeronautica-release-artifacts
           path: |
-            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1.mrpack
-            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1-manual.zip
+            releases/*.mrpack
+            releases/*-manual.zip
             releases/SHA256SUMS
 
+      # Pinned by commit SHA per repository policy (third-party action).
+      # v2 tag -> v2.6.2 at pin time (2026-07-30). Re-verify with:
+      #   gh api repos/softprops/action-gh-release/git/refs/tags/v2
       - name: Upload GitHub Release assets
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           files: |
-            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1.mrpack
-            releases/Aeronautica-The-Wandering-City-0.1.0-alpha.1-manual.zip
+            releases/*.mrpack
+            releases/*-manual.zip
             releases/SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

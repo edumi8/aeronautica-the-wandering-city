@@ -1,0 +1,16 @@
+{
+  "_purpose": "Versioned regression baseline for the nightly performance suite (Phase 8). The pipeline currently fails ONLY on catastrophic behavior (worldgen timeout, health loss, OOM, inability to complete) regardless of this file's contents -- see worldgen_perf.py and TESTING.md 'why arbitrary ERROR log lines are not automatic failures'. Once a nightly run has produced several stable spark-snapshot.txt samples on GitHub-hosted runners, replace the null fields below with observed medians and the pipeline can start comparing against them. Do not hand-guess numbers here.",
+  "schema_version": 1,
+  "established": false,
+  "established_from_runs": [],
+  "baseline": {
+    "mspt_median_ms": null,
+    "mspt_p95_ms": null,
+    "tps_median": null,
+    "worldgen_chunks_per_second_radius_100": null
+  },
+  "regression_thresholds": {
+    "_note": "Left unset intentionally -- see _purpose. Suggested shape once populated: {\"mspt_p95_ms_max\": <number>, \"tps_median_min\": <number>}.",
+    "enabled": false
+  }
+}

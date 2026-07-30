@@ -31,6 +31,8 @@ or:
 
 The build validates the JSON, resolves the Modrinth dependency tree, downloads each selected file, verifies every SHA-512 checksum, and writes the release artefacts under releases/.
 
+For deeper testing (artifact security/structure validation, independent installs, client/server smoke tests, GameTests, worldgen), see [TESTING.md](TESTING.md). At minimum, run `python scripts/test_pipeline.py fast` before opening a pull request.
+
 ## Why versions must be pinned
 
 The pack uses explicit version pins for the core physics compatibility set so that the build remains reproducible and so that a dependency update cannot silently replace the intended Clockwork / Valkyrien Skies / Eureka stack.
