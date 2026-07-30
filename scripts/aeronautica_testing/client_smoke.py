@@ -104,7 +104,7 @@ def _download(url: str, dest: Path, *, timeout: float = 300) -> StepOutcome:
 import urllib.error  # noqa: E402 - grouped near use for readability of the try/except above
 
 
-def install_forge_client(gamedir: Path, cache_dir: Path, *, timeout: float = 900, log_path: Path | None = None) -> StepOutcome:
+def install_forge_client(gamedir: Path, cache_dir: Path, *, timeout_seconds: float = 900, log_path: Path | None = None) -> StepOutcome:
     gamedir.mkdir(parents=True, exist_ok=True)
     (gamedir / "launcher_profiles.json").write_text(MINIMAL_LAUNCHER_PROFILES, encoding="utf-8")
 
@@ -118,7 +118,7 @@ def install_forge_client(gamedir: Path, cache_dir: Path, *, timeout: float = 900
             ["java", "-jar", str(installer_path), "--installClient", str(gamedir)],
             capture_output=True,
             text=True,
-            timeout=timeout,
+            timeout=timeout_seconds,
             encoding="utf-8",
             errors="replace",
         )
@@ -129,7 +129,7 @@ def install_forge_client(gamedir: Path, cache_dir: Path, *, timeout: float = 900
             log_path.write_text(partial, encoding="utf-8")
         return StepOutcome(
             False,
-            f"forge installer did not finish within {timeout}s (treated as a hang, not a hard crash -- "
+            f"forge installer did not finish within {timeout_seconds}s (treated as a hang, not a hard crash -- "
             "class-patching across the whole vanilla jar is CPU-bound and can be slow on a loaded machine)",
             [str(log_path)] if log_path else [],
         )
@@ -158,13 +158,13 @@ def verify_installed_forge_version(gamedir: Path) -> StepOutcome:
     return StepOutcome(True, f"verified installed version id={data['id']} inheritsFrom={data['inheritsFrom']}", [str(version_json_path)])
 
 
-def stage_pack_mods(mrpack_path: Path, gamedir: Path, *, timeout: float = 900, log_path: Path | None = None) -> StepOutcome:
+def stage_pack_mods(mrpack_path: Path, gamedir: Path, *, timeout_seconds: float = 900, log_path: Path | None = None) -> StepOutcome:
     inventory_path = gamedir / ".aeronautica-install-inventory.json"
     result = subprocess.run(
         [sys.executable, str(WORKER_SCRIPT), str(mrpack_path), str(gamedir), "--inventory-out", str(inventory_path), "--skip-dependencies"],
         capture_output=True,
         text=True,
-        timeout=timeout,
+        timeout=timeout_seconds,
         encoding="utf-8",
         errors="replace",
     )
@@ -210,11 +210,37 @@ def _pump_stdout_to_queue(stream, sink: "queue.Queue[str | None]") -> None:
         sink.put(None)  # sentinel: stream closed / process exited
 
 
+def _isolated_launcher_home_env(gamedir: Path) -> dict[str, str]:
+    """HeadlessMC 2.10.0 resolves its OWN installed-version catalog (the
+    `versions`/`launch`/`json` commands) independently of `-Dhmc.gamedir` --
+    confirmed by a real run (2026-07-30) where a Forge build installed into
+    an isolated gamedir was invisible to `launch <id>` ("Couldn't find
+    object for name"), while HeadlessMC's `versions` command listed entries
+    from this machine's real, personal %APPDATA%\\.minecraft\\versions
+    instead (verified by directly listing that folder). HeadlessMC follows
+    the same per-OS ".minecraft" convention as the vanilla launcher
+    (Windows: %APPDATA%\\.minecraft, Linux/macOS: $HOME/.minecraft;
+    confirmed empirically for Windows by redirecting APPDATA to an empty
+    temp dir and observing `versions` return empty). Redirecting the child
+    process's APPDATA (Windows) or HOME (Linux/macOS) env var to
+    `gamedir.parent` makes that lookup resolve to `gamedir` itself -- as
+    long as `gamedir` is literally named ".minecraft" (see run_client's
+    `client_home / ".minecraft"` in suites.py) -- and as a side effect
+    keeps a developer's real, personal Minecraft installation untouched.
+    """
+    if gamedir.name != ".minecraft":
+        raise ValueError(
+            f"gamedir must be named '.minecraft' for HeadlessMC's launcher-home redirect to work, got: {gamedir}"
+        )
+    home_root = str(gamedir.parent)
+    return {"APPDATA": home_root} if platform.system() == "Windows" else {"HOME": home_root}
+
+
 def run_headless_session(
     headlessmc_jar: Path,
     gamedir: Path,
     *,
-    timeout: float,
+    timeout_seconds: float,
     log_path: Path,
     offline_username: str = "AeronauticaTester",
 ) -> StepOutcome:
@@ -233,6 +259,7 @@ def run_headless_session(
 
     env = dict(os.environ)
     env.setdefault("LIBGL_ALWAYS_SOFTWARE", "1")
+    env.update(_isolated_launcher_home_env(gamedir))
 
     command = [
         "java",
@@ -242,12 +269,6 @@ def run_headless_session(
         "-jar",
         str(headlessmc_jar),
     ]
-    stdin_script = "\n".join(
-        [
-            f"launch {FORGE_VERSION_ID} -lwjgl",
-            "",  # extra newline flushes the last command on some shells
-        ]
-    )
 
     log_path.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -267,22 +288,79 @@ def run_headless_session(
         return StepOutcome(False, f"could not launch java/headlessmc: {exc}")
 
     output_lines: list[str] = []
-    try:
-        assert process.stdin is not None
-        process.stdin.write(stdin_script)
-        process.stdin.flush()
-    except OSError:
-        pass
-
     assert process.stdout is not None
     line_queue: "queue.Queue[str | None]" = queue.Queue()
     reader = threading.Thread(target=_pump_stdout_to_queue, args=(process.stdout, line_queue), daemon=True)
     reader.start()
 
+    def _send(cmd: str) -> None:
+        try:
+            assert process.stdin is not None
+            process.stdin.write(cmd + "\n")
+            process.stdin.flush()
+        except OSError:
+            pass
+
+    stream_closed = False
+    fatal_hit = False
+
+    def _drain_until(is_done, deadline_monotonic: float) -> bool:
+        """Reads lines into output_lines (shared with the main loop below)
+        until `is_done(line)` returns True. Returns False (without raising)
+        on a fatal signature, closed stream, or expired deadline, so callers
+        degrade gracefully into the main loop's own timeout/fatal handling
+        instead of needing duplicate error paths here.
+        """
+        nonlocal stream_closed, fatal_hit
+        while time.monotonic() < deadline_monotonic:
+            if stream_closed and process.poll() is not None:
+                return False
+            try:
+                line = line_queue.get(timeout=min(max(deadline_monotonic - time.monotonic(), 0), 1.0))
+            except queue.Empty:
+                continue
+            if line is None:
+                stream_closed = True
+                continue
+            output_lines.append(line.rstrip("\n"))
+            if any(sig in line for sig in FATAL_LOG_SIGNATURES):
+                fatal_hit = True
+                return False
+            if is_done(line):
+                return True
+        return False
+
+    # Forge's own installer only writes the vanilla client *jar* under
+    # versions/<mc_version>/ -- never the accompanying <mc_version>.json
+    # metadata (that's normally the real Mojang launcher's job). Without it,
+    # HeadlessMC's ParentVersionResolver can't resolve
+    # 1.20.1-forge-47.4.10's declared parent and `launch` fails with
+    # "Couldn't find object for name" even though the Forge version itself
+    # is fully installed and verified -- confirmed by direct investigation
+    # (2026-07-30). HeadlessMC's own `download` command fetches that
+    # missing vanilla metadata through its normal, official
+    # Mojang-manifest-based resolution.
+    #
+    # `download`'s completion print is NOT a reliable guarantee that its
+    # internal version catalog has finished registering the new
+    # parent/child link before the next stdin line is processed -- a real
+    # run (2026-07-30) sent `download`+`launch` back-to-back and hit
+    # "Couldn't find object" even though an unloaded solo repro of the same
+    # two commands succeeded, indicating a timing-sensitive race rather
+    # than a deterministic ordering bug. Actively wait for a terminal
+    # download signal before sending `launch`, instead of trusting stdin
+    # ordering alone, so the pipeline doesn't depend on winning that race.
+    _send(f"download {MC_VERSION}")
+    _drain_until(
+        lambda line: "Download successful" in line or "Couldn't find" in line or "already downloaded" in line.lower(),
+        min(started + timeout_seconds, time.monotonic() + 120),
+    )
+    if not fatal_hit:
+        _send(f"launch {FORGE_VERSION_ID} -lwjgl")
+
     try:
-        stream_closed = False
         while True:
-            remaining = timeout - (time.monotonic() - started)
+            remaining = timeout_seconds - (time.monotonic() - started)
             if remaining <= 0:
                 break
             if stream_closed and process.poll() is not None:
@@ -315,8 +393,8 @@ def run_headless_session(
     fatal_hits = [sig for sig in FATAL_LOG_SIGNATURES if sig in full_output]
     if fatal_hits:
         return StepOutcome(False, f"fatal signature(s) in client log: {fatal_hits}", [str(log_path)])
-    if duration >= timeout:
-        return StepOutcome(False, f"client session did not exit within {timeout}s (treated as hang)", [str(log_path)])
+    if duration >= timeout_seconds:
+        return StepOutcome(False, f"client session did not exit within {timeout_seconds}s (treated as hang)", [str(log_path)])
     if process.returncode not in (0, None):
         # A non-zero HeadlessMC exit after a clean-looking log is still
         # reported, but not auto-fatal: HeadlessMC's own wrapper process

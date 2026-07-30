@@ -479,13 +479,29 @@ def run_client(report: Report, ctx: RunContext) -> None:
         return
 
     mrpack_path = mrpacks[-1]
-    gamedir = ctx.workdir.new("client-gamedir")
+    # Must be named exactly ".minecraft": run_headless_session redirects the
+    # child process's APPDATA/HOME to this directory's parent so HeadlessMC's
+    # own launcher-home version lookup (which ignores -Dhmc.gamedir) resolves
+    # here instead of a developer's real, personal Minecraft installation --
+    # see client_smoke._isolated_launcher_home_env's docstring.
+    client_home = ctx.workdir.new("client-home")
+    gamedir = client_home / ".minecraft"
     evidence = ctx.evidence_dir("client")
 
     steps: list[tuple[str, Callable[[], client_smoke.StepOutcome]]] = [
-        ("client:install-forge", lambda: client_smoke.install_forge_client(gamedir, ctx.cache_dir, log_path=evidence / "forge-install.log")),
+        (
+            "client:install-forge",
+            lambda: client_smoke.install_forge_client(
+                gamedir, ctx.cache_dir, timeout_seconds=ctx.timeout("client_install_forge", 900), log_path=evidence / "forge-install.log"
+            ),
+        ),
         ("client:verify-forge-version", lambda: client_smoke.verify_installed_forge_version(gamedir)),
-        ("client:stage-pack-mods", lambda: client_smoke.stage_pack_mods(mrpack_path, gamedir, log_path=evidence / "stage-mods.log")),
+        (
+            "client:stage-pack-mods",
+            lambda: client_smoke.stage_pack_mods(
+                mrpack_path, gamedir, timeout_seconds=ctx.timeout("client_stage_mods", 900), log_path=evidence / "stage-mods.log"
+            ),
+        ),
         ("client:stage-test-helper-mod", lambda: client_smoke.stage_test_helper_mod(gamedir, ctx.cache_dir)),
         ("client:download-headlessmc", lambda: client_smoke.download_headlessmc(ctx.cache_dir)),
     ]
@@ -696,7 +712,12 @@ def _server_mod_command_checks(report: Report, name: str) -> list[str]:
         ("create", "create:cogwheel", 0, 100, 0),
         ("ad_astra", "ad_astra:steel_block", 5, 100, 0),
         ("vs_eureka", "vs_eureka:anchor", 0, 100, 5),
-        ("vs_clockwork", "vs_clockwork:propeller_bearing", 5, 100, 5),
+        # NOT vs_clockwork:propeller_bearing -- that ID is only a shared
+        # blockstate asset for these two variants (no registered block
+        # behind it; confirmed both by a live server rejecting it with
+        # "Unknown block type" on 2026-07-30 and by its absence from the
+        # jar's en_us.json, see extract_registry_facts.py).
+        ("vs_clockwork", "vs_clockwork:brass_propeller_bearing", 5, 100, 5),
         ("amendments", "amendments:wall_lantern", 10, 100, 0),
     ]
     server_smoke.ensure_scoreboard_objective(name, SCOREBOARD_OBJECTIVE)

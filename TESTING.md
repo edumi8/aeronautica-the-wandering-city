@@ -99,6 +99,20 @@ rights beyond what Docker Desktop itself needs.
   documented as a manual step -- see `docs/RELEASE_TEST_CHECKLIST.md`. This
   pipeline does not weaken or replace the GitHub Actions `client` job just
   because a given local machine's GUI automation would be fragile.
+- **HeadlessMC's own installed-version lookup ignores `-Dhmc.gamedir`.**
+  Confirmed by direct investigation (2026-07-30): HeadlessMC's `versions`/
+  `launch`/`json` commands resolve installed versions from the same
+  per-OS `.minecraft` location the vanilla launcher uses (Windows:
+  `%APPDATA%\.minecraft`, Linux/macOS: `$HOME/.minecraft`) regardless of
+  `-Dhmc.gamedir` -- installing Forge into an arbitrarily-named sandbox dir
+  left it permanently invisible to `launch <id>` ("Couldn't find object for
+  name"). `client_smoke.run_headless_session` works around this by
+  requiring `gamedir` to be literally named `.minecraft` (see
+  `run_client`'s `client_home / ".minecraft"` in `suites.py`) and
+  redirecting the child process's `APPDATA`/`HOME` env var to its parent,
+  so the lookup resolves to our sandbox instead of a developer's real,
+  personal Minecraft installation. Do not rename that directory without
+  updating `_isolated_launcher_home_env` to match.
 
 ## GitHub Actions
 

@@ -81,6 +81,8 @@ _DEFAULT_TIMEOUTS = {
     "build": 1200,
     "download": 120,
     "installer": 900,
+    "client_install_forge": 900,
+    "client_stage_mods": 900,
     "client_launch": 600,
     "server_health": 900,
     "server_stop": 120,

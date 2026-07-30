@@ -1,6 +1,6 @@
 {
   "_generated_by": "scripts/aeronautica_testing/tools/extract_registry_facts.py",
-  "_source": "Enumerated directly from the pinned mod jars in modpack/manifest.json resolved_mods (sha512-addressed). Every ID below was found verbatim as a blockstate/item-model/dimension file inside the shipped jar -- none were guessed.",
+  "_source": "Enumerated directly from the pinned mod jars in modpack/manifest.json resolved_mods (sha512-addressed). Every ID below was found verbatim as a blockstate/item-model/dimension file inside the shipped jar -- none were guessed. curated_blocks is additionally cross-checked against assets/<mod_id>/lang/en_us.json's block.<mod_id>.<name> keys (when the jar has one) so a shared/orphaned blockstate asset with no real registered block behind it (e.g. vs_clockwork:propeller_bearing, a parent asset for its brass_/juryrigged_ variants, or amendments:skull_candle*) cannot be curated as if it were placeable.",
   "mods": {
     "ad-astra": {
       "mod_id": "ad_astra",
@@ -36,10 +36,6 @@
       "total_items_found": 2,
       "curated_blocks": [
         "amendments:hanging_flower_pot",
-        "amendments:skull_candle",
-        "amendments:skull_candle_soul",
-        "amendments:skull_candle_soul_wall",
-        "amendments:skull_candle_wall",
         "amendments:skull_pile",
         "amendments:wall_lantern"
       ],
@@ -84,8 +80,7 @@
         "vs_clockwork:combustion_engine",
         "vs_clockwork:gas_engine",
         "vs_clockwork:gas_thruster",
-        "vs_clockwork:juryrigged_propeller_bearing",
-        "vs_clockwork:propeller_bearing"
+        "vs_clockwork:juryrigged_propeller_bearing"
       ],
       "curated_items": [],
       "curated_dimensions": []
@@ -165,8 +160,7 @@
         "supplementaries:candle_holder_white",
         "supplementaries:candle_holder_yellow",
         "supplementaries:clock_block",
-        "supplementaries:sign_post",
-        "supplementaries:sign_post_wall"
+        "supplementaries:sign_post"
       ],
       "curated_items": [],
       "curated_dimensions": []

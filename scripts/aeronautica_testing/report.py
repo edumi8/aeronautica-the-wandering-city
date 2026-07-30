@@ -125,6 +125,14 @@ class Report:
         self.results.append(result)
         self._print_line(result)
         _emit_annotation(result)
+        # Written after every single result, not just once at the end via
+        # cli.py's _finish(): a GitHub Actions job-level `timeout-minutes`
+        # cancellation can hard-kill this process well before a graceful
+        # KeyboardInterrupt/finally block would ever run, and the upload
+        # step's `if: always()` needs *something* on disk to grab. The cost
+        # is negligible (a few KB, well under suite-step timescales).
+        self.write_json()
+        self.write_junit()
         return result
 
     def record(

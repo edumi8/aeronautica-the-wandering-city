@@ -76,6 +76,20 @@ def _mod_id_from_toml(zf: zipfile.ZipFile) -> str | None:
     return None
 
 
+def _lang_block_names(zf: zipfile.ZipFile, mod_id: str) -> set[str] | None:
+    """Real, in-game translated names for this mod's blocks, keyed by the
+    bare name after ``block.<mod_id>.``. Returns None if the mod ships no
+    en_us.json at all (signals "no opinion" to the caller, distinct from an
+    empty set).
+    """
+    try:
+        lang = json.loads(zf.read(f"assets/{mod_id}/lang/en_us.json").decode("utf-8"))
+    except KeyError:
+        return None
+    prefix = f"block.{mod_id}."
+    return {key[len(prefix) :] for key in lang if key.startswith(prefix)}
+
+
 def extract(slug: str, mod: dict) -> dict:
     jar_path = _download(mod)
     with zipfile.ZipFile(jar_path) as zf:
@@ -85,6 +99,19 @@ def extract(slug: str, mod: dict) -> dict:
         blockstates = [n for n in names if f"assets/{mod_id}/blockstates/" in n and n.endswith(".json")]
         item_models = [n for n in names if f"assets/{mod_id}/models/item/" in n and n.endswith(".json")]
         dimensions = [n for n in names if f"data/{mod_id}/dimension/" in n and n.endswith(".json")]
+        # A blockstate JSON is a *client rendering asset* and is NOT proof a
+        # block is actually registered/placeable -- confirmed the hard way:
+        # vs_clockwork ships assets/vs_clockwork/blockstates/propeller_bearing.json
+        # (a shared parent asset for its brass_/juryrigged_ variants) with NO
+        # registered block behind it, which a real dedicated-server /setblock
+        # rejected with "Unknown block type" (CI run 2026-07-30). A block's
+        # translated name (assets/<mod_id>/lang/en_us.json, key
+        # "block.<mod_id>.<name>") is emitted per registered block by
+        # essentially every mod's datagen regardless of loot-table
+        # conventions (tried loot_tables/blocks/ first -- too strict, e.g.
+        # amendments only datagens loot tables for 2 of its 34 blocks), so
+        # cross-check against lang instead wherever the jar has one.
+        lang_block_names = _lang_block_names(zf, mod_id)
 
         def stem(path: str) -> str:
             return path.rsplit("/", 1)[-1][: -len(".json")]
@@ -97,12 +124,20 @@ def extract(slug: str, mod: dict) -> dict:
         item_kw = ITEM_FILTERS.get(slug, [])
         dim_kw = DIMENSION_FILTERS.get(slug, [])
 
+        candidate_blocks = [b for b in blocks if any(k in b for k in block_kw)] if block_kw else []
+        if lang_block_names is not None:
+            curated_blocks = [b for b in candidate_blocks if b.split(":", 1)[1] in lang_block_names]
+        else:
+            # No en_us.json at all in this jar -- blockstate presence is the
+            # best available signal, same as before this cross-check existed.
+            curated_blocks = candidate_blocks
+
         return {
             "mod_id": mod_id,
             "source_jar_sha512": mod["sha512"],
             "total_blocks_found": len(blocks),
             "total_items_found": len(items),
-            "curated_blocks": [b for b in blocks if any(k in b for k in block_kw)] if block_kw else [],
+            "curated_blocks": curated_blocks,
             "curated_items": [i for i in items if any(k in i for k in item_kw)] if item_kw else [],
             "curated_dimensions": [d for d in dims if any(k in d for k in dim_kw)] if dim_kw else [],
         }
@@ -118,7 +153,11 @@ def main() -> int:
         "_source": (
             "Enumerated directly from the pinned mod jars in modpack/manifest.json resolved_mods "
             "(sha512-addressed). Every ID below was found verbatim as a blockstate/item-model/dimension "
-            "file inside the shipped jar -- none were guessed."
+            "file inside the shipped jar -- none were guessed. curated_blocks is additionally "
+            "cross-checked against assets/<mod_id>/lang/en_us.json's block.<mod_id>.<name> keys (when "
+            "the jar has one) so a shared/orphaned blockstate asset with no real registered block behind "
+            "it (e.g. vs_clockwork:propeller_bearing, a parent asset for its brass_/juryrigged_ variants, "
+            "or amendments:skull_candle*) cannot be curated as if it were placeable."
         ),
         "mods": {},
     }
