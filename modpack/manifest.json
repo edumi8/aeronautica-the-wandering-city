@@ -1,6 +1,6 @@
 {
   "name": "Aeronautica: The Wandering City",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "author": "Aeronautica project",
   "description": "Experimental alpha modpack for Minecraft Java 1.20.1 Forge.",
   "minecraft": "1.20.1",
@@ -20,11 +20,11 @@
     },
     {
       "slug": "valkyrien-skies",
-      "version": "1.20.1-forge-2.4.5"
+      "version": "1.20.1-forge-2.4.11"
     },
     {
       "slug": "eureka",
-      "version": "1.20.1-forge-1.6.0"
+      "version": "1.20.1-forge-1.6.3"
     },
     {
       "slug": "kotlin-for-forge"
@@ -350,21 +350,21 @@
       "slug": "eureka",
       "project_id": "EO8aSHxh",
       "project_title": "Eureka! Ships! for Valkyrien Skies (Forge/Fabric)",
-      "version_id": "dWwTr8Ds",
-      "version_number": "1.20.1-forge-1.6.0",
-      "download_url": "https://cdn.modrinth.com/data/EO8aSHxh/versions/dWwTr8Ds/eureka-1201-1.6.0.jar",
-      "filename": "eureka-1201-1.6.0.jar",
-      "path": "mods/eureka-1201-1.6.0.jar",
-      "file_size": 462883,
-      "sha1": "81dd000d2baa8e9a35f2c4886e3fd54d6910e5c0",
-      "sha512": "d123c8a8026e1e6b093cb8d01efbd34679f0797210c2ff27fe2017b097fe700b5472a02050ae3077ce82a020d3aa278633142dbe8a7dcc6b973c484600a1b54a",
+      "version_id": "w2tkVjFR",
+      "version_number": "1.20.1-forge-1.6.3",
+      "download_url": "https://cdn.modrinth.com/data/EO8aSHxh/versions/w2tkVjFR/eureka-1201-1.6.3.jar",
+      "filename": "eureka-1201-1.6.3.jar",
+      "path": "mods/eureka-1201-1.6.3.jar",
+      "file_size": 462827,
+      "sha1": "676bd10482e286ca74882629c38cf16ae25971b8",
+      "sha512": "7ab6b0f3aa81e572efbb8f0b109c0a8852c4f145f467ce3903e2336d782d81fc9fe5cf2c8a14edb508f92a613def5e47680e370cdaef80956d436920343b89d4",
       "client_side": "required",
       "server_side": "required",
       "env": {
         "client": "required",
         "server": "required"
       },
-      "requested_version": "1.20.1-forge-1.6.0"
+      "requested_version": "1.20.1-forge-1.6.3"
     },
     {
       "slug": "farmers-delight",
@@ -790,21 +790,21 @@
       "slug": "valkyrien-skies",
       "project_id": "V5ujR2yw",
       "project_title": "Valkyrien Skies",
-      "version_id": "nFABSxad",
-      "version_number": "1.20.1-forge-2.4.5",
-      "download_url": "https://cdn.modrinth.com/data/V5ujR2yw/versions/nFABSxad/valkyrienskies-120-2.4.5.jar",
-      "filename": "valkyrienskies-120-2.4.5.jar",
-      "path": "mods/valkyrienskies-120-2.4.5.jar",
-      "file_size": 23949819,
-      "sha1": "e69a64ecf15c2235649a949ae2fbebf17611e7ea",
-      "sha512": "ad6d4d683f68712fd72b947be40b01a54520528b4e43737c2e7b913b3bea1ea63d1be0c2926a47e3ab9216c7a095d33bde56fee192cee1874efefa8a01e3db67",
+      "version_id": "pOkdwuUh",
+      "version_number": "1.20.1-forge-2.4.11",
+      "download_url": "https://cdn.modrinth.com/data/V5ujR2yw/versions/pOkdwuUh/valkyrienskies-120-2.4.11.jar",
+      "filename": "valkyrienskies-120-2.4.11.jar",
+      "path": "mods/valkyrienskies-120-2.4.11.jar",
+      "file_size": 27752937,
+      "sha1": "bd3478fcd43d4168950dfa7e77188d7bb12fd43e",
+      "sha512": "6a0d959ed4bf76f08dcad0e6a360bda842d85386a05f510069eafbcc6b46b4216cdcfd9e377f82e4266b0f07e6b74118d8382af0bafcbdd65712f8a92f16e146",
       "client_side": "required",
       "server_side": "required",
       "env": {
         "client": "required",
         "server": "required"
       },
-      "requested_version": "1.20.1-forge-2.4.5"
+      "requested_version": "1.20.1-forge-2.4.11"
     },
     {
       "slug": "xaeros-minimap",

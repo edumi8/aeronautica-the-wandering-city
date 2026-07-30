@@ -21,7 +21,7 @@ from typing import Any
 API = "https://api.modrinth.com/v2"
 MC_VERSION = "1.20.1"
 LOADER = "forge"
-USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.1 (local installer)"
+USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.2 (local installer)"
 
 
 def request_json(url: str) -> Any:

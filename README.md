@@ -73,11 +73,21 @@ The fallback installer resolves Modrinth dependencies, verifies SHA-512 hashes, 
 
 ## System requirements
 
-- Minecraft Java Edition 1.20.1
-- Forge 47.4.10
-- Java 17
+- Minecraft Java Edition 1.20.1 (required)
+- Forge 47.4.10 (required)
+- Java 17 (required; tested with Eclipse Adoptium 17.0.16)
 - 8 GB RAM minimum, 10 GB recommended for multiplayer or very large cities
 - A new world is strongly recommended
+
+### Tested core version matrix
+
+- Minecraft 1.20.1
+- Forge 47.4.10
+- Create 6.0.8
+- Clockwork 0.5.6
+- Valkyrien Skies 2.4.11
+- Eureka 1.6.3
+- Java 17
 
 ## Build instructions
 
@@ -97,7 +107,8 @@ The build validates the JSON and repository layout, resolves the Modrinth depend
 
 ## Performance recommendations for the moving city
 
-- Start with Java 17 and conservative render distance
+- Use Java 17 (required)
+- Use conservative render distance while the city is moving
 - Allocate 8 GB RAM minimum; 10 GB is safer for multiplayer or large cities
 - Anchor the city before running heavy farms or large multiblock chains
 - Test ship blocks and block entities on a small vessel before scaling them up

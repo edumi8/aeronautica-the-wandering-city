@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.2
+
+- Fixed startup failure caused by Clockwork 0.5.6 requiring Valkyrien Skies 2.4.6 or newer.
+- Updated Valkyrien Skies from 2.4.5 to 2.4.11.
+- Updated Eureka from 1.6.0 to 1.6.3.
+- Confirmed Java 17 as the required runtime.
+- Added core compatibility validation to prevent silent version conflicts between core physics mods.
+
 ## 0.1.0-alpha.1
 
 - Established the Minecraft 1.20.1 Forge 47.4.10 baseline.

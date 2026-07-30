@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 API = "https://api.modrinth.com/v2"
-USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.1 (build validator)"
+USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.2 (build validator)"
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "modpack" / "manifest.json"
@@ -98,6 +98,24 @@ def hash_remote_file(url: str) -> tuple[str, int]:
     return digest.hexdigest(), total
 
 
+def verify_core_compatibility(selected_by_slug: dict[str, dict[str, Any]]) -> None:
+    clockwork = selected_by_slug.get("create-clockwork")
+    valkyrien_skies = selected_by_slug.get("valkyrien-skies")
+    
+    if clockwork and valkyrien_skies:
+        clockwork_version = clockwork.get("version_number", "")
+        vs_version = valkyrien_skies.get("version_number", "")
+        if "0.5.6" in clockwork_version:
+            if "2.4." in vs_version:
+                vs_minor = int(vs_version.split("2.4.")[1].split(".")[0])
+                if vs_minor < 6:
+                    raise RuntimeError(
+                        f"Incompatible mod versions: Clockwork 0.5.6 requires Valkyrien Skies 2.4.6 or above, "
+                        f"but you have Valkyrien Skies {vs_version}. "
+                        f"The pinned versions must be updated together."
+                    )
+
+
 def verify_structure(manifest: dict[str, Any]) -> None:
     if manifest.get("loader") != "forge":
         raise RuntimeError("Only Forge is supported by this pack.")
@@ -165,6 +183,8 @@ def build_resolved_manifest(manifest: dict[str, Any], verify_downloads: bool) ->
     for source_mod in source_mods:
         version = select_version(source_mod["slug"], source_mod.get("version"))
         register_version(version, source_mod["slug"])
+
+    verify_core_compatibility(selected_by_slug)
 
     resolved_mods: list[dict[str, Any]] = []
     for slug, version in selected_by_slug.items():
