@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.3
+
+- Added Amendments 1.20-2.2.5 for Supplementaries compatibility.
+- Restored wall lanterns, skull candles, ceiling pots, ceiling banners, skull piles, and other building features moved out of Supplementaries.
+- Removed the first-launch warning that Amendments was not installed.
+- Recorded that alpha.2 reached a fresh singleplayer world successfully.
+- Large airships, long-running worlds, multiplayer, and dedicated servers remain untested.
+
 ## 0.1.0-alpha.2
 
 - Fixed startup failure caused by Clockwork 0.5.6 requiring Valkyrien Skies 2.4.6 or newer.
@@ -16,3 +24,4 @@
 - Added a publishable Modrinth-compatible pack layout with validated dependency resolution and checksum verification.
 - Added professional project documentation, contribution guidance, and an automated build workflow.
 - Kept the KubeJS foundation and the campaign documentation intact for future progression tuning.
+

@@ -1,6 +1,6 @@
 {
   "name": "Aeronautica: The Wandering City",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "author": "Aeronautica project",
   "description": "Experimental alpha modpack for Minecraft Java 1.20.1 Forge.",
   "minecraft": "1.20.1",
@@ -75,6 +75,10 @@
       "slug": "supplementaries"
     },
     {
+      "slug": "amendments",
+      "version": "1.20-2.2.5"
+    },
+    {
       "slug": "moonlight"
     },
     {
@@ -125,6 +129,26 @@
         "server": "required"
       },
       "requested_version": null
+    },
+    {
+      "slug": "amendments",
+      "project_id": "6iTJugQR",
+      "project_title": "Amendments",
+      "version_id": "73W8UHX3",
+      "version_number": "1.20-2.2.5",
+      "download_url": "https://cdn.modrinth.com/data/6iTJugQR/versions/73W8UHX3/amendments-1.20-2.2.5.jar",
+      "filename": "amendments-1.20-2.2.5.jar",
+      "path": "mods/amendments-1.20-2.2.5.jar",
+      "file_size": 1301022,
+      "sha1": "5d5a1d7d2d2dd37c578fdea2495757baaa624092",
+      "sha512": "7f1ebaefc4d71e523e92acd5e7b255695c7248695f9c89c393527146128c2780c4cdc079e3982485309dbf2a093dedd0a42177bed8242b641fd77692f211ef34",
+      "client_side": "required",
+      "server_side": "required",
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "requested_version": "1.20-2.2.5"
     },
     {
       "slug": "appleskin",
@@ -429,7 +453,7 @@
     {
       "slug": "jade",
       "project_id": "nvQzSEkH",
-      "project_title": "Jade 🔍",
+      "project_title": "Jade ðŸ”",
       "version_id": "xJQHCmWJ",
       "version_number": "11.13.3+forge",
       "download_url": "https://cdn.modrinth.com/data/nvQzSEkH/versions/xJQHCmWJ/Jade-1.20.1-Forge-11.13.3.jar",
@@ -848,3 +872,4 @@
     }
   ]
 }
+

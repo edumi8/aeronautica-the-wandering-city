@@ -6,7 +6,7 @@ Aeronautica: The Wandering City is a progression-first Minecraft Forge 1.20.1 mo
 
 ## Progression overview
 
-Survival → Create → Steam → Aviation → Moving Sky City → Electricity → Space Program → Colonization
+Survival â†’ Create â†’ Steam â†’ Aviation â†’ Moving Sky City â†’ Electricity â†’ Space Program â†’ Colonization
 
 The campaign structure is documented in [overrides/docs/PROGRESSION.md](overrides/docs/PROGRESSION.md) and the operating rules for ships and city movement are documented in [overrides/docs/SHIP-RULES.md](overrides/docs/SHIP-RULES.md).
 
@@ -16,6 +16,7 @@ The campaign structure is documented in [overrides/docs/PROGRESSION.md](override
 - Steam-era logistics and rail progression
 - Experimental aircraft and airship travel
 - A moving sky-city playstyle with physics-sensitive infrastructure
+- Supplementaries and Amendments building details for a richer aerial city
 - Electricity and advanced industrialization with Create: New Age
 - Ad Astra-driven space program and colonization goals
 - KubeJS foundation for future progression scripting and tuning
@@ -89,6 +90,13 @@ The fallback installer resolves Modrinth dependencies, verifies SHA-512 hashes, 
 - Eureka 1.6.3
 - Java 17
 
+### Smoke-test status
+
+Alpha.2 reached the main menu and loaded a fresh singleplayer world using
+PollyMC 8.0, Forge 47.4.10, and Eclipse Adoptium Java 17.0.16. This confirms
+basic client startup and world creation only; large airships, long-running
+worlds, multiplayer, and dedicated servers remain untested.
+
 ## Build instructions
 
 From the repository root, run either:
@@ -140,3 +148,4 @@ Contributions are welcome. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for the
 ## License
 
 This project is distributed under the MIT License. See [LICENSE](LICENSE) for details.
+

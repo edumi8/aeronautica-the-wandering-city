@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 API = "https://api.modrinth.com/v2"
-USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.2 (build validator)"
+USER_AGENT = "Aeronautica-Wandering-City/0.1.0-alpha.3 (build validator)"
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "modpack" / "manifest.json"
@@ -23,7 +23,7 @@ INDEX_PATH = ROOT / "modpack" / "modrinth.index.json"
 ICON_PATH = ROOT / "modpack" / "icon.png"
 OVERRIDES_PATH = ROOT / "overrides"
 RELEASES_PATH = ROOT / "releases"
-EXPECTED_MOD_COUNT = 37
+EXPECTED_MOD_COUNT = 38
 
 
 def request_json(url: str) -> Any:
@@ -327,3 +327,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         raise SystemExit(1)
+
