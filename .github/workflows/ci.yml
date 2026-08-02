@@ -159,17 +159,29 @@ jobs:
       - run: python -m pip install -r tests/requirements.txt
       - name: Install Xvfb + software OpenGL
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb mesa-utils libgl1-mesa-dri libgl1
+      - name: Start virtual display
+        run: |
+          Xvfb :99 -screen 0 1280x720x24 -nolisten tcp > /tmp/aeronautica-xvfb.log 2>&1 &
+          for i in {1..60}; do
+            test -S /tmp/.X11-unix/X99 && exit 0
+            sleep 0.5
+          done
+          cat /tmp/aeronautica-xvfb.log
+          exit 1
       - name: Download the exact artifact the build job produced
         uses: actions/download-artifact@v4
         with:
           name: mrpack-build-${{ github.sha }}
           path: releases
-      - name: Cache client downloads (Forge/HeadlessMC/mc-runtime-test/vanilla assets)
+      - name: Cache client downloads (Forge/vanilla assets)
         uses: actions/cache@v4
         with:
           path: .cache/aeronautica-test-downloads
           key: aeronautica-client-${{ hashFiles('modpack/manifest.json') }}-mc1.20.1-forge47.4.10-java17-${{ runner.os }}
       - name: client suite
+        env:
+          DISPLAY: ':99'
+          LIBGL_ALWAYS_SOFTWARE: '1'
         run: python scripts/test_pipeline.py client --output-dir test-results
       - name: Upload test-results (logs, crash reports, screenshot)
         if: always()
