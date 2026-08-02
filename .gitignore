@@ -23,3 +23,7 @@ releases/SHA256SUMS
 # always regenerable, never a second source of truth.
 /test-results*/
 /.cache/
+
+# HeadlessMC creates launcher/account state relative to the process working
+# directory. It is machine-specific and may contain local Java/account data.
+/HeadlessMC/
