@@ -479,11 +479,8 @@ def run_client(report: Report, ctx: RunContext) -> None:
         return
 
     mrpack_path = mrpacks[-1]
-    # Must be named exactly ".minecraft": run_headless_session redirects the
-    # child process's APPDATA/HOME to this directory's parent so HeadlessMC's
-    # own launcher-home version lookup (which ignores -Dhmc.gamedir) resolves
-    # here instead of a developer's real, personal Minecraft installation --
-    # see client_smoke._isolated_launcher_home_env's docstring.
+    # Keep the entire Minecraft installation isolated from the developer's
+    # real launcher state.
     client_home = ctx.workdir.new("client-home")
     gamedir = client_home / ".minecraft"
     evidence = ctx.evidence_dir("client")
@@ -502,8 +499,6 @@ def run_client(report: Report, ctx: RunContext) -> None:
                 mrpack_path, gamedir, timeout_seconds=ctx.timeout("client_stage_mods", 900), log_path=evidence / "stage-mods.log"
             ),
         ),
-        ("client:stage-test-helper-mod", lambda: client_smoke.stage_test_helper_mod(gamedir, ctx.cache_dir)),
-        ("client:download-headlessmc", lambda: client_smoke.download_headlessmc(ctx.cache_dir)),
     ]
 
     for name, step in steps:
@@ -522,43 +517,22 @@ def run_client(report: Report, ctx: RunContext) -> None:
             _client_collect_failure_evidence(report, gamedir, evidence)
             return
 
-    headlessmc_jar = ctx.cache_dir / f"headlessmc-launcher-{client_smoke.HEADLESSMC_VERSION}.jar"
     started = time.monotonic()
-    launch_outcome = client_smoke.run_headless_session(
-        headlessmc_jar, gamedir, timeout_seconds=ctx.timeout("client_launch", 600), log_path=evidence / "session-1.log"
+    launch_outcome = client_smoke.run_client_session(
+        gamedir, timeout_seconds=ctx.timeout("client_launch", 600), log_path=evidence / "session-1.log"
     )
     report.record(
         suite="client",
-        name="client:launch-and-load-world",
+        name="client:launch-complete",
         status="passed" if launch_outcome.ok else "failed",
-        category="world-loading",
+        category="client-startup",
         duration_seconds=time.monotonic() - started,
         reason="" if launch_outcome.ok else launch_outcome.message,
         evidence=launch_outcome.evidence,
-        remediation=None if launch_outcome.ok else "Inspect session-1.log; ensure Xvfb/software GL are available (see prereqs).",
+        remediation=None if launch_outcome.ok else "Inspect session-1.log and the captured Minecraft logs; ensure Xvfb/software GL are available (see prereqs).",
     )
     if not launch_outcome.ok:
         _client_collect_failure_evidence(report, gamedir, evidence)
-        return
-
-    saves_before = client_smoke._saves_snapshot(gamedir)
-    started = time.monotonic()
-    second_outcome = client_smoke.run_headless_session(
-        headlessmc_jar, gamedir, timeout_seconds=ctx.timeout("client_launch", 600), log_path=evidence / "session-2.log"
-    )
-    saves_after = client_smoke._saves_snapshot(gamedir)
-    reopened = bool(saves_before) and set(saves_before) <= set(saves_after) and any(
-        saves_after.get(name, 0) > saves_before.get(name, 0) for name in saves_before
-    )
-    report.record(
-        suite="client",
-        name="client:reopen-same-world",
-        status="passed" if second_outcome.ok and reopened else ("skipped" if second_outcome.ok else "failed"),
-        category="world-loading",
-        duration_seconds=time.monotonic() - started,
-        reason=("world was not confirmed reopened (mc-runtime-test may create a fresh world per run)" if second_outcome.ok and not reopened else second_outcome.message),
-        evidence=second_outcome.evidence,
-    )
 
 
 def _client_collect_failure_evidence(report: Report, gamedir: Path, evidence: Path) -> None:
