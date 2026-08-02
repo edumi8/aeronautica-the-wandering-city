@@ -57,7 +57,7 @@ Stable and documented (`scripts/aeronautica_testing/exit_codes.py`):
 | `prereqs` | Prints detected vs. required versions for every tool any suite might need, with exact remediation. Always exits 0/3 based on whether *mandatory* tools (Python, Java) are present; everything else is informational. | nothing | a few seconds |
 | `fast` | `python -m compileall` on the pipeline itself, manifest/compat-matrix structural checks against the already-resolved `modpack/manifest.json` (no network), `pytest tests/unit`, and a structural check of whatever `.mrpack` already exists in `releases/` if any. This is the suite to run on every save. | nothing (network-free) | a few seconds |
 | `artifact` | Builds the pack for real (`scripts/validate.py --build --verify-downloads`), then: ZIP/path-security/duplicate/hash-syntax/env validation (Phase 3's full checklist), downloads and re-verifies every declared file's actual size/SHA-1/SHA-512, batch-verifies Modrinth-hosted files against `POST /v2/version_files`, checks `SHA256SUMS`, runs an **independent** install via `minecraft-launcher-lib` and diffs the resulting file tree against the index, and builds the pack **twice more** into isolated temp dirs to confirm byte-identical SHA-256 output. | network | 3-8 min (mod downloads) |
-| `client` | Installs the exact Forge `1.20.1-47.4.10` client profile via Forge's own installer, verifies that version JSON before ever launching, stages the built `.mrpack`'s mods/overrides via the same independent installer as `artifact`, stages the MC-Runtime-Test helper mod (dev-instance only, never released), and drives HeadlessMC through a real headless launch: join/create a singleplayer world, wait, exit; then a second launch to check the same world reopens. | Java 17, network, Linux+Xvfb (native or via `docker/client-test.Dockerfile`) | 5-15 min |
+| `client` | Installs and verifies the exact Forge `1.20.1-47.4.10` client, stages the built `.mrpack`, and launches the complete pack with `minecraft-launcher-lib` against a real Xvfb/Mesa OpenGL context. It passes only after Forge, all mods, resources, shaders and the graphical client finish startup without a fatal signature. World/chunk/block/persistence behavior belongs to the deterministic `server` suite. | Java 17, network, Linux+Xvfb (native or via `docker/client-test.Dockerfile`) | 2-10 min |
 | `server` | Boots the actual local `.mrpack` in `itzg/minecraft-server:java17` (Modrinth-modpack mode, the image's own exclude/include heuristics disabled so the pack's own `env.client`/`env.server` metadata is what's actually tested), confirms Java 17 / Minecraft 1.20.1 / Forge 47.4.10 from the container, RCON `list`, force-loads a chunk, runs sentinel-verified placement checks against real registry IDs (Create/Ad Astra/Eureka/Clockwork/Amendments), saves, stops cleanly, restarts from the same data directory, and confirms persistence. | Docker | 5-10 min |
 | `gametest` | Stages every production mod jar the pack resolves to, builds the `tests/gametest/` ForgeGradle userdev project, and runs `gradlew runGameTestServer`. Fails loudly (not silently) if zero tests were discovered. **Currently blocked -- see "Known limitations".** | Java 17, network, ~2 GB disk for Gradle/ForgeGradle caches | 3-40 min (first run downloads/decompiles; later runs are fast) |
 | `worldgen` | Boots a server, injects test-only pinned Chunky + spark (never the release pack), pre-generates a fixed-seed radius around spawn, and captures a local (never uploaded) TPS/health snapshot. | Docker | 5-30 min depending on radius |
@@ -99,20 +99,15 @@ rights beyond what Docker Desktop itself needs.
   documented as a manual step -- see `docs/RELEASE_TEST_CHECKLIST.md`. This
   pipeline does not weaken or replace the GitHub Actions `client` job just
   because a given local machine's GUI automation would be fragile.
-- **HeadlessMC's own installed-version lookup ignores `-Dhmc.gamedir`.**
-  Confirmed by direct investigation (2026-07-30): HeadlessMC's `versions`/
-  `launch`/`json` commands resolve installed versions from the same
-  per-OS `.minecraft` location the vanilla launcher uses (Windows:
-  `%APPDATA%\.minecraft`, Linux/macOS: `$HOME/.minecraft`) regardless of
-  `-Dhmc.gamedir` -- installing Forge into an arbitrarily-named sandbox dir
-  left it permanently invisible to `launch <id>` ("Couldn't find object for
-  name"). `client_smoke.run_headless_session` works around this by
-  requiring `gamedir` to be literally named `.minecraft` (see
-  `run_client`'s `client_home / ".minecraft"` in `suites.py`) and
-  redirecting the child process's `APPDATA`/`HOME` env var to its parent,
-  so the lookup resolves to our sandbox instead of a developer's real,
-  personal Minecraft installation. Do not rename that directory without
-  updating `_isolated_launcher_home_env` to match.
+- **The client suite uses a normal launcher command, not a no-context LWJGL
+  shim.** Embeddium creates real OpenGL fence objects during its post-render
+  hook. CI starts Xvfb and forces Mesa software rendering so the complete pack
+  is exercised against a real virtual OpenGL context.
+- **Client and world contracts are deliberately separate.** MC-Runtime-Test
+  4.5.1 can remain in an overlay-wait loop after this pack has completed
+  startup, producing a false ten-minute hang. The client job proves graphical
+  startup and terminates at its positive marker; the server job proves world
+  loading, chunk access, registry blocks, clean restart and persistence.
 
 ## GitHub Actions
 
@@ -234,10 +229,8 @@ there is exactly one rule set, never two that can drift.
       print(slug, json.load(urllib.request.urlopen(req))[0]["version_number"])
   PY
   ```
-- **HeadlessMC / MC-Runtime-Test**: bump `HEADLESSMC_VERSION` /
-  `MC_RUNTIME_TEST_VERSION` in `scripts/aeronautica_testing/client_smoke.py`
-  after confirming the new release publishes a `mc-runtime-test-1.20.1-<ver>-lexforge-release.jar`
-  asset on its GitHub Releases page.
+- **Client launcher dependency**: bump `minecraft-launcher-lib` in
+  `tests/requirements.txt`, then rerun the `client` suite.
 - **Gradle wrapper**: `cd tests/gametest && gradle wrapper --gradle-version <new>`
   if you have a system Gradle, or replace `gradle/wrapper/gradle-wrapper.jar`
   from `https://raw.githubusercontent.com/gradle/gradle/v<version>/gradle/wrapper/gradle-wrapper.jar`
@@ -288,11 +281,6 @@ there is exactly one rule set, never two that can drift.
   a live server in this session -- treat the first real nightly run as the
   actual verification and adjust `worldgen_perf.py`'s regex-based
   completion/progress parsing if the exact wording differs.
-- **Second-launch "same world reopened" check** (`client` suite) is
-  best-effort: it compares the `saves/` directory before/after a second
-  HeadlessMC launch and reports honestly (`passed`/`skipped` with a clear
-  reason) rather than assuming success if MC-Runtime-Test turns out to
-  create a fresh world per run.
 
 ## Why Java 17 and Forge 47.4.10 are pinned
 
@@ -328,8 +316,8 @@ an existing regex.
 
 See the coverage matrix in `docs/RELEASE_TEST_CHECKLIST.md` for the full
 per-feature breakdown. In short: static validation, artifact structure,
-downloads/hashes, independent install, client startup + world/chunk
-loading, server startup/health/RCON/persistence, and (once unblocked)
+downloads/hashes, independent install, graphical client startup, server
+world/chunk loading/health/RCON/persistence, and (once unblocked)
 GameTest gameplay-logic assertions are automated. Full manual-launcher
 import (Modrinth App / Prism / PollyMC), extended multi-hour play,
 multiplayer with real second players, and subjective rendering/shader
