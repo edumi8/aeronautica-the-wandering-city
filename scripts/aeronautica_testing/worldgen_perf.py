@@ -9,7 +9,9 @@ multi-source-pack env vars: the mounted /data/mods directory is ours to
 manage directly once the Modrinth sync has run once.
 
 Worldgen uses Chunky's standard admin commands (`chunky world/radius/center
-/start`, unchanged across Forge/Fabric/Paper for years). Performance uses
+/start/progress` -- see https://github.com/pop4959/Chunky/wiki/Commands,
+and CHUNKY_DONE_RE's comment below for the real, live-verified RCON
+response text). Performance uses
 spark's plain-text `tps`/`health` commands only -- deliberately NOT the
 `spark profiler` sampler, whose default output uploads to a public
 bytebin-based viewer; this pipeline never uploads profiling data anywhere.
@@ -27,7 +29,21 @@ from .server_smoke import _docker, is_running, rcon  # noqa: SLF001 - intentiona
 
 TOOLS_LOCK_PATH = paths.WORLDGEN_DIR / "tools-lock.json"
 
-CHUNKY_DONE_RE = re.compile(r"(Completed|Chunky finished|Task finished)", re.IGNORECASE)
+# Both the wording and the correct command were wrong before this comment
+# existed -- confirmed by two real, live runs against a real dedicated
+# server (2026-07-30): `chunky query` is rejected outright ("Incorrect
+# argument for command"; the real command is `chunky progress`, per
+# https://github.com/pop4959/Chunky/wiki/Commands), and even after fixing
+# that, Chunky's real idle/done response is "[Chunky] No tasks running."
+# -- never any of "Completed"/"Chunky finished"/"Task finished", which
+# never appeared in real output and would have polled until timeout on
+# every run, exactly as the first real worldgen suite execution did
+# (worldgen:generate-radius-50 timed out at the 5400s cap with that
+# original regex). `chunky start`'s own response was also verified live:
+# "[Chunky] Task started in <world> for the square region centered at
+# <x>, <z> with radius <r>."
+CHUNKY_START_CONFIRMED_RE = re.compile(r"task started", re.IGNORECASE)
+CHUNKY_DONE_RE = re.compile(r"no tasks running", re.IGNORECASE)
 
 
 @dataclass
@@ -110,19 +126,19 @@ def run_worldgen(
         return WorldgenOutcome(False, f"chunky radius failed: {radius_result.message}")
 
     start_result = rcon(container, "chunky start")
-    if not start_result.ok:
-        return WorldgenOutcome(False, f"chunky start failed: {start_result.message}")
+    if not start_result.ok or not CHUNKY_START_CONFIRMED_RE.search(start_result.message):
+        return WorldgenOutcome(False, f"chunky start did not confirm a task began: {start_result.message!r}")
 
     last_status = ""
+    last_progress_status = ""  # last reading *before* completion, for the best-effort chunk count below
     while time.monotonic() - started < timeout_seconds:
         if not is_running(container):
             return WorldgenOutcome(False, "server container exited during worldgen", duration_seconds=time.monotonic() - started)
-        status = rcon(container, "chunky continue")  # a no-op prompt if already running on most builds; used as a liveness probe
-        last_status = status.message
-        progress = rcon(container, "chunky query")
+        progress = rcon(container, "chunky progress")
         last_status = progress.message or last_status
         if CHUNKY_DONE_RE.search(last_status):
             break
+        last_progress_status = last_status
         time.sleep(poll_interval)
     else:
         return WorldgenOutcome(
@@ -132,7 +148,11 @@ def run_worldgen(
         )
 
     duration = time.monotonic() - started
-    chunks_match = re.search(r"(\d+)\s+chunk", last_status)
+    # Best-effort only: Chunky's confirmed-real "No tasks running" done
+    # message carries no chunk count, so this can only ever come from an
+    # in-progress reading (if the task ran long enough for one) -- None is
+    # the honest answer when it doesn't, not a fabricated count.
+    chunks_match = re.search(r"(\d+)\s+chunk", last_progress_status)
     chunks = int(chunks_match.group(1)) if chunks_match else None
     return WorldgenOutcome(True, f"worldgen completed: {last_status}", chunks_processed=chunks, duration_seconds=duration)
 
