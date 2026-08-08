@@ -7,8 +7,7 @@ name: nightly
 # compatibility experiment.
 
 on:
-  schedule:
-    - cron: '17 5 * * *' # 05:17 UTC daily -- off-the-hour to avoid GitHub's fixed-time scheduling thundering herd
+# 05:17 UTC daily -- off-the-hour to avoid GitHub's fixed-time scheduling thundering herd
   workflow_dispatch:
     inputs:
       worldgen_radius:
